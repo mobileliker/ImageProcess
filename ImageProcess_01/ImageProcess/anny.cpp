@@ -1,0 +1,27 @@
+// anny.cpp: implementation of the Canny class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "ImageProcess.h"
+#include "anny.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+Canny::Canny()
+{
+
+}
+
+Canny::~Canny()
+{
+
+}
