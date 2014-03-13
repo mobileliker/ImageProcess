@@ -136,6 +136,7 @@ protected:
 	afx_msg void OnMenuitemVideorobertoperator();
 	afx_msg void OnMenuitemVideoprewittoperator();
 	afx_msg void OnMenuitemGetthinimageqta();
+	afx_msg void OnMenuitemGetthinimagehilditch();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

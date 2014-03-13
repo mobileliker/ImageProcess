@@ -216,6 +216,8 @@ BEGIN
                                                 ID_MENUITEM_GETTHINIMAGEQTA
         MENUITEM "CompleteIsolatePoint",        ID_MENUITEM_COMPLETEISOLATEPOINT
 
+        MENUITEM "GetThinImage(Hilditch)",      ID_MENUITEM_GETTHINIMAGEHILDITCH
+
     END
     POPUP "Video"
     BEGIN

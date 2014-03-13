@@ -108,6 +108,7 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VIDEOROBERTOPERATOR, OnMenuitemVideorobertoperator)
 	ON_COMMAND(ID_MENUITEM_VIDEOPREWITTOPERATOR, OnMenuitemVideoprewittoperator)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEQTA, OnMenuitemGetthinimageqta)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH, OnMenuitemGetthinimagehilditch)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -5486,7 +5487,9 @@ void CImageProcessDoc::OnMenuitemGetthinimageqta()
 		}
 	}
 
+	DWORD start_time = GetTickCount();
 	QucikThinning(img_data,channel_image[0]->width,channel_image[0]->height);
+	DWORD end_time = GetTickCount();
 
 	for(y = 0; y < channel_image[0]->height; ++y)
 	{
@@ -5508,53 +5511,182 @@ void CImageProcessDoc::OnMenuitemGetthinimageqta()
 
 	UpdateAllViews(NULL);
 
-	/*
+	timeSpan = end_time - start_time;
 
-	IplImage *thin_image = cvCreateImage(cvGetSize(r_plane),IPL_DEPTH_8U,1);
+}
 
-	if(thin_image->origin != r_plane->origin) thin_image->origin = r_plane->origin;
-
-	BYTE **imgBuf = new BYTE*[r_plane->height];
-	for(
-
-	int x,y;
-	CvScalar scalar;
-	for(x = 0; x < r_plane->width; x++)
+//                                  p3  p2  p1
+//*************计算近邻的连接数     p4  p   p0 
+//                                  p5  p6  p7
+int Get8Connectivity(int* neighbor)
+{	
+ 
+	//计算补集x^=1-x;
+	for(int i=0;i<8;i++)
 	{
-		for(y = 0; y < r_plane->height; y++)
+		neighbor[i]=neighbor[i]==0?1:0;
+	}	
+	
+	int count= neighbor[0]-(neighbor[0]&neighbor[1]&neighbor[2]);
+	count+= neighbor[2]-(neighbor[2]&neighbor[3]&neighbor[4]);
+	count+= neighbor[4]-(neighbor[4]&neighbor[5]&neighbor[6]);
+	count+= neighbor[6]-(neighbor[6]&neighbor[7]&neighbor[0]);
+ 
+	return count;
+}
+void HilditchThinning(int w,int h,BYTE *imgBuf)
+{
+	//           p3  p2  p1
+	// 8近邻     p4  p   p0 
+	//           p5  p6  p7
+	int neighbor[8]; 
+	BYTE *mask=new BYTE[w*h];
+	memset(mask,0,w*h);
+ 
+	BOOL loop=TRUE;
+	int x,y,k,index;
+ 
+	int loopNum = 0;
+	while(loop)
+	{
+		loop=FALSE;
+		loopNum++;
+ 
+		for(y=0;y<h;y++)
 		{
-			scalar = cvGet2D(r_plane,y,x);
-			if(scalar.val[0] == 255) imgBuf[y*r_plane->width+x] = 1;
-			else imgBuf[y*r_plane->width+x] = 0;
+			for(x=0;x<w;x++)
+			{
+				index=y*w+x;
+ 
+				//条件1：p必须是前景点
+				if(imgBuf[index]==0 ) continue;
+ 
+				neighbor[0]=x+1<w ? imgBuf[y*w+x+1] : 0;
+				neighbor[1]=y-1>0&&x+1<w ? imgBuf[(y-1)*w+x+1] : 0;
+				neighbor[2]=y-1>0 ? imgBuf[(y-1)*w+x] : 0;
+				neighbor[3]=y-1>0&&x-1<0 ? imgBuf[(y-1)*w+x-1] : 0;
+				neighbor[4]=x-1>0 ? imgBuf[y*w+x-1] : 0;
+				neighbor[5]=x-1>0&&y+1<h ? imgBuf[(y+1)*w+x-1] : 0;
+				neighbor[6]=y+1<h ? imgBuf[(y+1)*w+x] : 0;
+				neighbor[7]=y+1<h&&x+1<w ? imgBuf[(y+1)*w+x+1] : 0;
+ 
+				//条件2：p0,p2,p4,p6不全为前景色（否则把点p删了，图像空心）
+				if(neighbor[0]&&neighbor[2]&&neighbor[4]&&neighbor[6])
+					continue;
+ 
+				//条件3：p0~p7中，至少有个为前景色
+				//（若只有一个为，则为端点，若没有为的，则为孤立点）
+				int count=0;
+				for(int i=0;i<8;i++)
+				{
+					if(neighbor[i]==255)
+						count++;
+				}
+				if(count<2)  
+				{
+					continue;
+				}
+ 
+				//条件4：p的八近邻连接数必须为1
+				if(Get8Connectivity(neighbor)!=1) continue;
+ 
+				//条件5：若p2已经被标记删除，则当p2为背景色时，P的连接数仍需为1
+				k=(y-1)*w+x;
+				if(y-1>0 && mask[k]==1)
+				{				
+					imgBuf[k]=0;
+					if(Get8Connectivity(neighbor)!=1) continue;
+					imgBuf[k]=1;
+				}
+ 
+				//条件6：若p4已经被标记删除，则当p4为背景色时，P的连接数仍需为1
+				k=y*w+x-1;
+				if(x-1>0 && mask[k]==1)
+				{				
+					imgBuf[k]=0;
+					if(Get8Connectivity(neighbor)!=1) continue;
+					imgBuf[k]=1;
+				}
+ 
+				//标记删除
+				mask[w*y+x]=1;	
+				loop=TRUE;
+			}
+		}
+ 
+ 
+		//将标记删除的点置为背景色
+		for(y=0;y<h;y++)
+		{
+			for(x=0;x<w;x++)
+			{
+				k=y*w+x;
+				if(mask[k]==1) imgBuf[k]=0;
+			}
+		}	
+ 
+ 
+	}
+	
+ 
+}
+
+
+void CImageProcessDoc::OnMenuitemGetthinimagehilditch() 
+{
+	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 255;
 		}
 	}
 
+
+
 	DWORD start_time = GetTickCount();
-
-	Rosenfeld((char *)imgBuf, r_plane->width,r_plane->height);
-
+	HilditchThinning(channel_image[0]->width,channel_image[0]->height,imgBuf);
 	DWORD end_time = GetTickCount();
 
-	for(x = 0; x < r_plane->width; x++)
+	for(y = 0; y < channel_image[0]->height; ++y)
 	{
-		for(y = 0; y < r_plane->height; y++)
+		for(x = 0; x < channel_image[0]->width; ++x)
 		{
-			scalar = cvGet2D(r_plane,y,x);
-			if(imgBuf[y*r_plane->width+x]
-			scalar.val[0] = imgBuf[y*r_plane->width+x];
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
 			cvSet2D(thin_image,y,x,scalar);
 		}
 	}
+
+	delete [] imgBuf;
 
 	m_image.CopyOf(thin_image,thin_image->nChannels);
 
 	cvSaveImage("D://log/thin_image_rosenfeld.bmp",thin_image);
 
-	cvNot(pImg,pImg);
-
 	UpdateAllViews(NULL);
 
-	delete[] imgBuf;
-
-	timeSpan = end_time - start_time;*/
+	timeSpan = end_time - start_time;
 }
