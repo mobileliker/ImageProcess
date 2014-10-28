@@ -6,13 +6,7 @@
 --------------------Configuration: ImageProcess - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP4B8C.tmp" with contents
-[
-/nologo /MTd /W3 /Gm /GX /ZI /Od /I "D:\Program Files\OpenCV\otherlibs\_graphics\include" /I "D:\Program Files\OpenCV\otherlibs\highgui" /I "D:\Program Files\OpenCV\cxcore\include" /I "D:\Program Files\OpenCV\cv\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR"Debug/" /Fp"Debug/ImageProcess.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp"
-]
-Creating command line "cl.exe @D:\Users\wuzhihui\AppData\Local\Temp\RSP4B8C.tmp" 
-Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP4B8D.tmp" with contents
+Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP909A.tmp" with contents
 [
 cv.lib cxcore.lib highgui.lib cvcam.lib vfw32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/ImageProcess.pdb" /debug /machine:I386 /out:"Debug/ImageProcess.exe" /pdbtype:sept /libpath:"D:\Program Files\OpenCV\lib" 
 .\Debug\Canny.obj
@@ -30,46 +24,10 @@ cv.lib cxcore.lib highgui.lib cvcam.lib vfw32.lib comctl32.lib /nologo /subsyste
 .\Debug\StdAfx.obj
 .\Debug\ImageProcess.res
 ]
-Creating command line "link.exe @D:\Users\wuzhihui\AppData\Local\Temp\RSP4B8D.tmp"
+Creating command line "link.exe @D:\Users\wuzhihui\AppData\Local\Temp\RSP909A.tmp"
 <h3>Output Window</h3>
-Compiling...
-ImageProcessDoc.cpp
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(270) : warning C4101: 'lp_frame' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(378) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1003) : warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1009) : warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1133) : warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1139) : warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1199) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1200) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1201) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1684) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1685) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(1686) : warning C4553: '==' : operator has no effect; did you intend '='?
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2093) : warning C4101: 'lp_frame' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2141) : warning C4101: 'j' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2237) : warning C4101: 'lp_frame' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2289) : warning C4101: 'j' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2408) : warning C4101: 'lp_frame' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2540) : warning C4101: 'lp_frame' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2748) : warning C4101: 'b_x' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2747) : warning C4101: 'a_x' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2708) : warning C4101: 'j' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2748) : warning C4101: 'b_y' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(2747) : warning C4101: 'a_y' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3118) : warning C4101: 'b_x' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3117) : warning C4101: 'a_x' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3079) : warning C4101: 'j' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3118) : warning C4101: 'b_y' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3117) : warning C4101: 'a_y' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3676) : warning C4101: 'scalar' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3674) : warning C4101: 'x' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3674) : warning C4101: 'y' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3954) : warning C4101: 'i' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(3954) : warning C4101: 'j' : unreferenced local variable
-F:\Data\ImageProcess\code\ImageProcess_01\ImageProcess\ImageProcessDoc.cpp(5418) : warning C4101: 'sum' : unreferenced local variable
 Linking...
-Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP4D91.tmp" with contents
+Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP9F0C.tmp" with contents
 [
 /nologo /o"Debug/ImageProcess.bsc" 
 .\Debug\StdAfx.sbr
@@ -85,14 +43,14 @@ Creating temporary file "D:\Users\wuzhihui\AppData\Local\Temp\RSP4D91.tmp" with 
 .\Debug\SelectSize.sbr
 .\Debug\SelectThresholdDialog.sbr
 .\Debug\SlectCalculateStyleDialog.sbr]
-Creating command line "bscmake.exe @D:\Users\wuzhihui\AppData\Local\Temp\RSP4D91.tmp"
+Creating command line "bscmake.exe @D:\Users\wuzhihui\AppData\Local\Temp\RSP9F0C.tmp"
 Creating browse info file...
 <h3>Output Window</h3>
 
 
 
 <h3>Results</h3>
-ImageProcess.exe - 0 error(s), 34 warning(s)
+ImageProcess.exe - 0 error(s), 0 warning(s)
 </pre>
 </body>
 </html>

@@ -218,6 +218,8 @@ BEGIN
 
         MENUITEM "GetThinImage(Hilditch)",      ID_MENUITEM_GETTHINIMAGEHILDITCH
 
+        MENUITEM "GetThinImage(Pavlidis)",      ID_MENUITEM_GETTHINIMAGEPAVLIDIS
+
     END
     POPUP "Video"
     BEGIN

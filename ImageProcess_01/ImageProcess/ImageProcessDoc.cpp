@@ -109,6 +109,7 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VIDEOPREWITTOPERATOR, OnMenuitemVideoprewittoperator)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEQTA, OnMenuitemGetthinimageqta)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH, OnMenuitemGetthinimagehilditch)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEPAVLIDIS, OnMenuitemGetthinimagepavlidis)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -5417,37 +5418,39 @@ void QucikThinning(BYTE **img_data,int width,int height)
 
 	int sum;
 	int count = 0;
-	for(y = 1; y <= height; ++y)
+	bool flag = true;
+	while(flag)
 	{
-		for(x = 1; x <= width; ++x)
+		flag = false;
+		for(y = 1; y <= height; ++y)
 		{
-			if(src[y][x] == 1)
+			for(x = 1; x <= width; ++x)
 			{
-				int sum4_p = 0;
-				for(i = 1; i < 8; i+=2) sum4_p += src[y + idx_y[i]][x + idx_x[i]];
-				if(sum4_p < 4)
+				if(src[y][x] == 1)
 				{
-					int s1 = 0,s2 = 0;
-					for(i = 0;i < 8; ++i)
+					int sum4_p = 0;
+					for(i = 1; i < 8; i+=2) sum4_p += src[y + idx_y[i]][x + idx_x[i]];
+					if(sum4_p < 4)
 					{
-						s1 += src[y + idx_y[i]][x + idx_x[i]];
-						s2 += abs(src[y + idx_y[(i + 1) % 8]][x + idx_x[(i + 1) % 8]] - src[y + idx_y[i]][x + idx_x[i]]);
-					}
-					if(s1 == 2 && s2 != 1 && s2 < 6)
-					{
-						++count;
-						src[y][x] = 0;
-						img_data[y - 1][x - 1] = 0;
-						y = 1; x = 1;
+						int s1 = 0,s2 = 0;
+						for(i = 0;i < 8; ++i)
+						{
+							s1 += src[y + idx_y[i]][x + idx_x[i]];
+							s2 += abs(src[y + idx_y[(i + 1) % 8]][x + idx_x[(i + 1) % 8]] - src[y + idx_y[i]][x + idx_x[i]]);
+						}
+						if(s1 == 2 && s2 != 1 && s2 < 6)
+						{
+							flag = true;
+							src[y][x] = 0;
+							img_data[y - 1][x - 1] = 0;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	char str[200];
-	sprintf(str,"%d",count);
-	AfxMessageBox(str);
+
 
 	for(y = 0; y <= height + 1; ++y) delete src[y];
 	delete [] src;
@@ -5689,4 +5692,41 @@ void CImageProcessDoc::OnMenuitemGetthinimagehilditch()
 	UpdateAllViews(NULL);
 
 	timeSpan = end_time - start_time;
+}
+
+/*void PavlidisThinning(BYTE *imgBuf,int w,int h)
+{
+	int y,x;
+	int i;
+
+	int idx_x[] = {1,1,0,-1,-1,-1,0,1};
+	int idx_y[] = {0,-1,-1,-1,0,1,1,1};
+	int adj[8];
+	for(y = 0; y < h; ++y)
+	{
+		for(x = 0; x < w; ++x)
+		{
+			if(imgBuf[y * w + x])
+			{
+				for(i =0;i < 8; ++i)
+				{
+					int temp_x = x + idx_x[i];
+					int temp_y = y + idx_y[i];
+					if(temp_x < 0 || temp_x >= w || temp_y < 0 || temp_y >= h) adj[i] = 0;
+					else adj[i] = imfBuf[temp_y * w + temp_x];
+				}
+
+				if(adj[0] && adj[2] && adj[4] && adj[6]) continue;
+
+				if(
+			}
+		}
+	}
+}*/
+
+
+void CImageProcessDoc::OnMenuitemGetthinimagepavlidis() 
+{
+	// TODO: Add your command handler code here
+	
 }
