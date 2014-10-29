@@ -140,6 +140,8 @@ protected:
 	afx_msg void OnMenuitemGetthinimagehilditch2();
 	afx_msg void OnMenuitemGetthinimagepavlidis();
 	afx_msg void OnMenuitemGetthinimageclassic();
+	afx_msg void OnMenuitemGetimageclassic2();
+	afx_msg void OnMenuitemAutotest();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

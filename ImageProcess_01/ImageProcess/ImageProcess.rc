@@ -189,6 +189,7 @@ BEGIN
 
         MENUITEM "GetHistogram",                ID_MENUITEM_GETHisTOGRAM
         MENUITEM "SmoothFiltering",             ID_MENUITEM_SMOOTHFILTERING
+        MENUITEM SEPARATOR
         MENUITEM "Binarization(mode)",          ID_MENUITEM_BINARIZATIONMODE
         MENUITEM "Binarization(Max Entropy)",   ID_MENUITEM_BINARIZATIONMAXENTROPY
 
@@ -198,12 +199,14 @@ BEGIN
 
         MENUITEM "Binarization(Mannal)",        ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL
 
+        MENUITEM SEPARATOR
         MENUITEM "RobertOperator",              ID_MENUITEM_ROBERTOPERATOR
         MENUITEM "PrewittOperator",             ID_MENUITEM_PREWITTOPERATOR
         MENUITEM "SobelOperator",               ID_MENUITEM_GETSEGMENTATIONIMAGESOBEL
 
         MENUITEM "CannyOperator",               ID_MENUITEM_GETSEGMENTATIONIMAGECANNY
 
+        MENUITEM SEPARATOR
         MENUITEM "GetThinImage(morphology)",    ID_MENUITEM_GETTHINIMAGEMORPHOLOGY
 
         MENUITEM "GetThinImage(Zhang)",         ID_MENUITEM_GETTHINIMAGEZHANG
@@ -220,10 +223,14 @@ BEGIN
 
         MENUITEM "GetThinImage(Pavlidis)",      ID_MENUITEM_GETTHINIMAGEPAVLIDIS
 
-        MENUITEM "GetThinImage(Classic)",       ID_MENUITEM_GETTHINIMAGECLASSIC
+        MENUITEM "GetThinImage(ZhangClassic)",  ID_MENUITEM_GETTHINIMAGECLASSIC
 
+        MENUITEM "GetThinImage(ZhangClassic2)", ID_MENUITEM_GETIMAGECLASSIC2
+        MENUITEM SEPARATOR
         MENUITEM "CompleteIsolatePoint",        ID_MENUITEM_COMPLETEISOLATEPOINT
 
+        MENUITEM SEPARATOR
+        MENUITEM "AutoTest",                    ID_MENUITEM_AUTOTEST
     END
     POPUP "Video"
     BEGIN

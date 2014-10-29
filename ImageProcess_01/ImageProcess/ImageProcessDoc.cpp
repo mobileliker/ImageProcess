@@ -112,6 +112,8 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH2, OnMenuitemGetthinimagehilditch2)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEPAVLIDIS, OnMenuitemGetthinimagepavlidis)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGECLASSIC, OnMenuitemGetthinimageclassic)
+	ON_COMMAND(ID_MENUITEM_GETIMAGECLASSIC2, OnMenuitemGetimageclassic2)
+	ON_COMMAND(ID_MENUITEM_AUTOTEST, OnMenuitemAutotest)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -911,8 +913,6 @@ void ZhangThinning(int w,int h,BYTE *imgBuf)
 
     int neighbor[8];
 
- 
-
     BYTE *mark=new BYTE[w*h];
 
     memset(mark,0,w*h);
@@ -934,7 +934,6 @@ void ZhangThinning(int w,int h,BYTE *imgBuf)
        loop=FALSE;
 
  
-
        //µÚÒ»²½
 
        markNum=0;
@@ -6222,7 +6221,7 @@ void CImageProcessDoc::OnMenuitemGetthinimagepavlidis()
 }
 
 
-void ThinnerPavlidis(BYTE *imgBuf,int width,int height,int interator)
+void ThinnerClassic(BYTE *imgBuf,int width,int height,int interator)
 {
 	BYTE *tempBuf = new BYTE[width * height];
 
@@ -6230,13 +6229,13 @@ void ThinnerPavlidis(BYTE *imgBuf,int width,int height,int interator)
 	int i = 0;
 	int flag = 0;
 	
-	int idx_x[] = {0,0,1,1,1,0,-1,-1,-1};
-	int idx_y[] = {0,-1,-1,0,1,1,1,0,-1};
+	int idx_x[] = {0,1,1,1,0,-1,-1,-1};
+	int idx_y[] = {-1,-1,0,1,1,1,0,-1};
 
 
 	while(interator--)
 	{
-		BYTE p[9];
+		BYTE p[8];
 		int count = 0;
 
 		flag = 0;
@@ -6257,23 +6256,23 @@ void ThinnerPavlidis(BYTE *imgBuf,int width,int height,int interator)
 			{
 				if(tempBuf[y * width + x] == 1)
 				{
-					for(i = 0; i < 9; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
 
-					//2 <= p1 + p2 + .. + p8 <= 6
+					//2 <= p0 + p2 + .. + p7 <= 6
 					count = 0;
-					for(i = 1; i < 9; ++i) count += p[i];
+					for(i = 0; i < 8; ++i) count += p[i];
 					if(count < 2 || count > 6) continue;
 
-					//p1->p8 01
+					//p0->p8 01
 					count = 0;
-					for(i = 1; i < 9; ++i)
+					for(i = 0; i < 8; ++i)
 					{
-						if(0 == p[i] && 1 == p[(i + 1) % 9]) ++count;
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
 					}
 					if(count != 1) continue;
 
-					//p1 * p3 * p5 = 0  && p3 * p5 * p7 = 0
-					if(0 == p[1] * p[3] * p[5] && 0 == p[3] * p[5] * p[7])
+					//p0 * p2 * p4 = 0 && p2 * p4 * p6 = 0
+					if((0 == p[0] * p[2] * p[4]) && (0 == p[2] * p[4] * p[6]))
 					{
 						flag = 1;
 						imgBuf[y * width + x] = 0;
@@ -6299,27 +6298,28 @@ void ThinnerPavlidis(BYTE *imgBuf,int width,int height,int interator)
 			{
 				if(tempBuf[y * width + x] == 1)
 				{
-					for(i = 0; i < 9; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
 
-					//2 <= p1 + p2 + .. + p8 <= 6
+					//2 <= p0 + p2 + .. + p7 <= 6
 					count = 0;
-					for(i = 1; i < 9; ++i) count += p[i];
+					for(i = 0; i < 8; ++i) count += p[i];
 					if(count < 2 || count > 6) continue;
 
-					//p1->p8 01
+					//p0->p8 01
 					count = 0;
-					for(i = 1; i < 9; ++i)
+					for(i = 0; i < 8; ++i)
 					{
-						if(0 == p[i] && 1 == p[(i + 1) % 9]) ++count;
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
 					}
 					if(count != 1) continue;
 
-					//p1 * p3 * p7 = 0  && p1 * p5 * p7 = 0
-					if(0 == p[1] * p[3] * p[7] && 0 == p[1] * p[5] * p[7])
+					//p0 * p2 * p6 = 0 && p0 * p4 * p6 = 0
+					if((0 == p[0] * p[2] * p[6]) && (0 == p[0] * p[4] * p[6]))
 					{
 						flag = 1;
 						imgBuf[y * width + x] = 0;
 					}
+
 
 				}
 			}
@@ -6367,7 +6367,7 @@ void CImageProcessDoc::OnMenuitemGetthinimageclassic()
 
 
 	DWORD start_time = GetTickCount();
-	ThinnerPavlidis(imgBuf,channel_image[0]->width,channel_image[0]->height,100);
+	ThinnerClassic(imgBuf,channel_image[0]->width,channel_image[0]->height,100);
 	DWORD end_time = GetTickCount();
 
 	for(y = 0; y < channel_image[0]->height; ++y)
@@ -6390,4 +6390,273 @@ void CImageProcessDoc::OnMenuitemGetthinimageclassic()
 	UpdateAllViews(NULL);
 
 	timeSpan = end_time - start_time;
+}
+
+
+void ThinnerClassic2(BYTE *imgBuf,int width,int height,int interator)
+{
+	BYTE *tempBuf = new BYTE[width * height];
+
+	int x = 0,y = 0;
+	int i = 0;
+	int flag = 0;
+	
+	int idx_x[] = {0,1,1,1,0,-1,-1,-1};
+	int idx_y[] = {-1,-1,0,1,1,1,0,-1};
+
+
+	while(interator--)
+	{
+		BYTE p[8];
+		int count = 0;
+
+		flag = 0;
+
+//step 1:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p0 + p2 + .. + p7 <= 6
+					count = 0;
+					for(i = 0; i < 8; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p0->p8 01
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
+					}
+					if(count != 1) continue;
+
+					//p0 * p2 * p4 = 0 && p2 * p4 * p6 = 0
+					if((0 == p[0] * p[2] * p[4]) && (0 == p[2] * p[4] * p[6]))
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+				}
+			}
+		}
+
+//step 2:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p0 + p2 + .. + p7 <= 6
+					count = 0;
+					for(i = 0; i < 8; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p0->p8 01
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
+					}
+					if(count != 1) continue;
+
+					//p0 * p2 * p6 = 0 && p0 * p4 * p6 = 0
+					if((0 == p[0] * p[2] * p[6]) && (0 == p[0] * p[4] * p[6]))
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+
+				}
+			}
+		}
+
+//step 3:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p0 + p2 + .. + p7 <= 6
+					count = 0;
+					for(i = 0; i < 8; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p0->p8 01
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
+					}
+					if(count != 1) continue;
+
+					//p0 * p2 * p4 = 0 && p6 * p2 * p4 = 0
+					if((0 == p[0] * p[2] * p[4]) && (0 == p[6] * p[2] * p[4]))
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+
+				}
+			}
+		}
+
+
+//step 4:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p0 + p2 + .. + p7 <= 6
+					count = 0;
+					for(i = 0; i < 8; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p0->p8 01
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
+					}
+					if(count != 1) continue;
+
+					//p2 * p4 * p6 = 0 && p4 * p6 * p0 = 0
+					if((0 == p[2] * p[4] * p[6]) && (0 == p[4] * p[6] * p[0]))
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+
+				}
+			}
+		}
+
+
+		if(flag == 0) break;
+	}
+
+	delete [] tempBuf;
+
+}
+
+void CImageProcessDoc::OnMenuitemGetimageclassic2() 
+{
+	// TODO: Add your command handler code here
+		// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 1;
+		}
+	}
+
+
+
+	DWORD start_time = GetTickCount();
+	ThinnerClassic2(imgBuf,channel_image[0]->width,channel_image[0]->height,100);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_classic2.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;
+}
+
+void CImageProcessDoc::OnMenuitemAutotest() 
+{
+	// TODO: Add your command handler code here
+	OnMenuitemGetgrayimage();
+	OnMenuitemGetreverseimage();
+	OnMenuitemGetthresholdimageotsu();
+	OnMenuitemGetimageclassic2();
 }
