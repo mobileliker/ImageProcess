@@ -109,7 +109,9 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VIDEOPREWITTOPERATOR, OnMenuitemVideoprewittoperator)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEQTA, OnMenuitemGetthinimageqta)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH, OnMenuitemGetthinimagehilditch)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH2, OnMenuitemGetthinimagehilditch2)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEPAVLIDIS, OnMenuitemGetthinimagepavlidis)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGECLASSIC, OnMenuitemGetthinimageclassic)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -1822,6 +1824,7 @@ void CImageProcessDoc::OnMenuitemSoybeangetthinimagedistance()
 
 	
 }
+
 
 void CImageProcessDoc::OnMenuitemGetsegmentationimagecanny() 
 {
@@ -5694,39 +5697,697 @@ void CImageProcessDoc::OnMenuitemGetthinimagehilditch()
 	timeSpan = end_time - start_time;
 }
 
-/*void PavlidisThinning(BYTE *imgBuf,int w,int h)
+
+void ThinnerHilditch(void *image, unsigned long lx, unsigned long ly)
 {
-	int y,x;
+    char *f, *g;
+    char n[10];
+    unsigned int counter;
+    short k, shori, xx, nrn;
+    unsigned long i, j;
+    long kk, kk11, kk12, kk13, kk21, kk22, kk23, kk31, kk32, kk33, size;
+    size = (long)lx * (long)ly;
+    g = (char *)malloc(size);
+
+    if(g == NULL)
+    {
+        printf("error in allocating memory!/n");
+        return;
+    }
+
+    f = (char *)image;
+    for(i=0; i<lx; i++)
+    {
+        for(j=0; j<ly; j++)
+        {
+            kk=i*ly+j;
+            if(f[kk]!=0)
+            {
+                f[kk]=1;
+                g[kk]=f[kk];
+            }
+        }
+    }
+
+    counter = 1;
+
+    do
+    {
+        //printf("%4d*",counter);
+        counter++;
+        shori = 0;
+
+        for(i=0; i<lx; i++)
+        {
+            for(j=0; j<ly; j++)
+            {
+                kk = i*ly+j;
+                if(f[kk]<0)
+                    f[kk] = 0;
+                g[kk]= f[kk];
+            }
+        }
+
+        for(i=1; i<lx-1; i++)
+        {
+            for(j=1; j<ly-1; j++)
+            {
+                kk=i*ly+j;
+
+                if(f[kk]!=1)
+                    continue;
+
+                kk11 = (i-1)*ly+j-1;
+                kk12 = kk11 + 1;
+                kk13 = kk12 + 1;
+                kk21 = i*ly+j-1;
+                kk22 = kk21 + 1;
+                kk23 = kk22 + 1;
+                kk31 = (i+1)*ly+j-1;
+                kk32 = kk31 + 1;
+                kk33 = kk32 + 1;
+
+                if((g[kk12]&&g[kk21]&&g[kk23]&&g[kk32])!=0)
+                    continue;
+
+                nrn = g[kk11] + g[kk12] + g[kk13] + g[kk21] + g[kk23] + 
+                    g[kk31] + g[kk32] + g[kk33];
+
+                if(nrn <= 1)
+                {
+                    f[kk22] = 2;
+                    continue;
+                }
+
+                n[4] = f[kk11];
+                n[3] = f[kk12];
+                n[2] = f[kk13];
+                n[5] = f[kk21];
+                n[1] = f[kk23];
+                n[6] = f[kk31];
+                n[7] = f[kk32];
+                n[8] = f[kk33];
+                n[9] = n[1];
+                xx = 0;
+
+                for(k=1; k<8; k=k+2)
+                {
+                    if((!n[k])&&(n[k+1]||n[k+2]))
+                        xx++;
+                }
+
+                if(xx!=1)
+                {
+                    f[kk22] = 2;
+                    continue;
+                }
+
+                if(f[kk12] == -1)
+                {
+                    f[kk12] = 0;
+                    n[3] = 0;
+                    xx = 0;
+
+                    for(k=1; k<8; k=k+2)
+                    {
+                        if((!n[k])&&(n[k+1]||n[k+2]))
+                            xx++;
+                    }
+
+                    if(xx != 1)
+                    {
+                        f[kk12] = -1;
+                        continue;
+                    }
+
+                    f[kk12] = -1;
+                    n[3] = -1;
+                }
+
+                if(f[kk21]!=-1)
+                {
+                    f[kk22] = -1;
+                    shori = 1;
+                    continue;
+                }
+
+                f[kk21] = 0;
+                n[5] = 0;
+                xx = 0;
+
+                for(k=1; k<8; k=k+2)
+                {
+                    if((!n[k])&&(n[k+1]||n[k+2]))
+                    {
+                        xx++;
+                    }
+                }
+
+                if(xx == 1)
+                {
+                    f[kk21] = -1;
+                    f[kk22] = -1;
+                    shori =1;
+                }
+                else
+                    f[kk21] = -1;
+            }
+        }
+    }while(shori);
+
+    free(g);
+}
+
+
+void CImageProcessDoc::OnMenuitemGetthinimagehilditch2() 
+{
+	// TODO: Add your command handler code here
 	int i;
+	int x,y;
 
-	int idx_x[] = {1,1,0,-1,-1,-1,0,1};
-	int idx_y[] = {0,-1,-1,-1,0,1,1,1};
-	int adj[8];
-	for(y = 0; y < h; ++y)
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
 	{
-		for(x = 0; x < w; ++x)
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
 		{
-			if(imgBuf[y * w + x])
-			{
-				for(i =0;i < 8; ++i)
-				{
-					int temp_x = x + idx_x[i];
-					int temp_y = y + idx_y[i];
-					if(temp_x < 0 || temp_x >= w || temp_y < 0 || temp_y >= h) adj[i] = 0;
-					else adj[i] = imfBuf[temp_y * w + temp_x];
-				}
-
-				if(adj[0] && adj[2] && adj[4] && adj[6]) continue;
-
-				if(
-			}
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 1;
 		}
 	}
-}*/
+
+
+
+	DWORD start_time = GetTickCount();
+	//HilditchThinning(channel_image[0]->width,channel_image[0]->height,imgBuf);
+	ThinnerHilditch(imgBuf,channel_image[0]->width,channel_image[0]->height);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_hilditch2.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;
+}
+
+//Pavlidis细化算法
+//功能：对图象进行细化
+//参数：image：代表图象的一维数组
+//      lx：图象宽度
+//      ly：图象高度
+//      无返回值
+void ThinnerPavlidis(void *image, unsigned long lx, unsigned long ly)
+{
+    char erase, n[8];
+    char *f;
+    unsigned char bdr1,bdr2,bdr4,bdr5;
+    short c,k,b;
+    unsigned long i,j;
+    long kk,kk1,kk2,kk3;
+    f = (char*)image;
+
+    for(i=1; i<lx-1; i++)
+    {
+        for(j=1; j<ly-1; j++)
+        {
+            kk = i*ly + j;
+            if(f[kk])
+                f[kk] = 1;
+        }
+    }
+
+    for(i=0, kk1=0, kk2=ly-1; i<lx; i++, kk1+=ly, kk2+=ly)
+    {
+        f[kk1]=0;
+        f[kk2]=0;
+    }
+
+    for(j=0, kk=(lx-1)*ly; j<ly; j++,kk++)
+    {
+        f[j]=0;
+        f[kk]=0;
+    }
+
+    c=5;
+    erase =1;
+    while(erase)
+    {
+        c++;
+        for(i=1; i<lx-1; i++)
+        {
+            for(j=1; j<ly-1; j++)
+            {
+                kk=i*ly+j;
+                if(f[kk]!=1)
+                    continue;
+
+                kk1 = kk-ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[3] = f[kk1];
+                n[2] = f[kk2];
+                n[1] = f[kk3];
+                kk1 = kk - 1;
+                kk3 = kk + 1;
+                n[4] = f[kk1];
+                n[0] = f[kk3];
+                kk1 = kk + ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[5] = f[kk1];
+                n[6] = f[kk2];
+                n[7] = f[kk3];
+
+                bdr1 =0;
+                for(k=0; k<8; k++)
+                {
+                    if(n[k]>=1)
+                        bdr1|=0x80>>k;
+                }
+
+                if((bdr1&0252)== 0252)
+                    continue;
+                f[kk] = 2;
+                b=0;
+
+                for(k=0; k<=7; k++)
+                {
+                    b+=bdr1&(0x80>>k);
+                }
+
+                if(b<=1)
+                    f[kk]=3;
+
+                if((bdr1&0160)!=0&&(bdr1&07)!=0&&(bdr1&0210)==0)
+                    f[kk]=3;
+                else if((bdr1&&0301)!=0&&(bdr1&034)!=0&&(bdr1&042)==0)
+                    f[kk]=3;
+                else if((bdr1&0202)==0 && (bdr1&01)!=0)
+                    f[kk]=3;
+                else if((bdr1&0240)==0 && (bdr1&0100)!=0)
+                    f[kk]=3;
+                else if((bdr1&050)==0 && (bdr1&020)!=0)
+                    f[kk]=3;
+                else if((bdr1&012)==0 && (bdr1&04)!=0)
+                    f[kk]=3;
+            }
+        }
+
+        for(i=1; i<lx-1; i++)
+        {
+            for(j=1; j<ly-1; j++)
+            {
+                kk = i*ly + j;
+                if(!f[kk])
+                    continue;
+
+                kk1 = kk - ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[3] = f[kk1];
+                n[2] = f[kk2];
+                n[1] = f[kk3];
+                kk1 = kk - 1;
+                kk2 = kk + 1;
+                n[4] = f[kk1];
+                n[0] = f[kk3];
+                kk1 = kk + ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[5] = f[kk1];
+                n[6] = f[kk2];
+                n[7] = f[kk3];
+                bdr1 = bdr2 =0;
+
+                for(k=0; k<=7; k++)
+                {
+                    if(n[k]>=1)
+                        bdr1|=0x80>>k;
+                    if(n[k]>=2)
+                        bdr2|=0x80>>k;
+                }
+
+                if(bdr1==bdr2)
+                {
+                    f[kk] = 4;
+                    continue;
+                }
+
+                if(f[kk]!=2)
+                    continue;
+
+                if((bdr2&0200)!=0 && (bdr1&010)==0 &&
+                    ((bdr1&0100)!=0 &&(bdr1&001)!=0 ||
+                    ((bdr1&0100)!=0 ||(bdr1 & 001)!=0) &&
+                    (bdr1&060)!=0 &&(bdr1&06)!=0))
+                {
+                    f[kk] = 4;
+                }
+
+                else if((bdr2&040)!=0 && (bdr1&02)==0 &&
+                    ((bdr1&020)!=0 && (bdr1&0100)!=0 ||
+                    ((bdr1&020)!=0 || (bdr1&0100)!=0) &&
+                    (bdr1&014)!=0 && (bdr1&0201)!=0))
+                {
+                    f[kk] = 4;
+                }
+
+                else if((bdr2&010)!=0 && (bdr1&0200)==0 &&
+                    ((bdr1&04)!=0 && (bdr1&020)!=0 ||
+                    ((bdr1&04)!=0 || (bdr1&020)!=0) &&
+                    (bdr1&03)!=0 && (bdr1&0140)!=0))
+                {
+                    f[kk] = 4;
+                }
+
+                else if((bdr2&02)!=0 && (bdr1&040)==0 &&
+                    ((bdr1&01)!=0 && (bdr1&04)!=0 ||
+                    ((bdr1&01)!=0 || (bdr1&04)!=0) &&
+                    (bdr1&0300)!=0 && (bdr1&030)!=0))
+                {
+                    f[kk] = 4;
+                }
+            }
+        }
+
+        for(i=1; i<lx-1; i++)
+        {
+            for(j=1; j<ly-1; j++)
+            {
+                kk = i*ly + j;
+                if(f[kk]!=2)
+                    continue;
+                kk1 = kk - ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[3] = f[kk1];
+                n[2] = f[kk2];
+                n[1] = f[kk3];
+                kk1 = kk - 1;
+                kk2 = kk + 1;
+                n[4] = f[kk1];
+                n[0] = f[kk3];
+                kk1 = kk + ly -1;
+                kk2 = kk1 + 1;
+                kk3 = kk2 + 1;
+                n[5] = f[kk1];
+                n[6] = f[kk2];
+                n[7] = f[kk3];
+                bdr4 = bdr5 =0;
+                for(k=0; k<=7; k++)
+                {
+                    if(n[k]>=4)
+                        bdr4|=0x80>>k;
+                    if(n[k]>=5)
+                        bdr5|=0x80>>k;
+                }
+                if((bdr4&010) == 0)
+                {
+                    f[kk] = 5;
+                    continue;
+                }
+                if((bdr4&040) == 0 && bdr5 ==0)
+                {
+                    f[kk] = 5;
+                    continue;
+                }
+                if(f[kk]==3||f[kk]==4)
+                    f[kk] = c;
+            }
+        }
+
+        erase = 0;
+        for(i=1; i<lx-1; i++)
+        {
+            for(j=1; j<ly-1; j++)
+            {
+                kk = i*ly +j;
+                if(f[kk]==2||f[kk] == 5)
+                {
+                    erase = 1;
+                    f[kk] = 0;
+                }
+            }
+        }
+    }
+}
 
 
 void CImageProcessDoc::OnMenuitemGetthinimagepavlidis() 
 {
 	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 1;
+		}
+	}
+
+
+
+	DWORD start_time = GetTickCount();
+	ThinnerPavlidis(imgBuf,channel_image[0]->width,channel_image[0]->height);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_hilditch2.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;
+}
+
+
+void ThinnerPavlidis(BYTE *imgBuf,int width,int height,int interator)
+{
+	BYTE *tempBuf = new BYTE[width * height];
+
+	int x = 0,y = 0;
+	int i = 0;
+	int flag = 0;
 	
+	int idx_x[] = {0,0,1,1,1,0,-1,-1,-1};
+	int idx_y[] = {0,-1,-1,0,1,1,1,0,-1};
+
+
+	while(interator--)
+	{
+		BYTE p[9];
+		int count = 0;
+
+		flag = 0;
+
+//step 1:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 9; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p1 + p2 + .. + p8 <= 6
+					count = 0;
+					for(i = 1; i < 9; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p1->p8 01
+					count = 0;
+					for(i = 1; i < 9; ++i)
+					{
+						if(0 == p[i] && 1 == p[(i + 1) % 9]) ++count;
+					}
+					if(count != 1) continue;
+
+					//p1 * p3 * p5 = 0  && p3 * p5 * p7 = 0
+					if(0 == p[1] * p[3] * p[5] && 0 == p[3] * p[5] * p[7])
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+				}
+			}
+		}
+
+//step 2:
+		//copy to tempBuf
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width - 1; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 9; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p1 + p2 + .. + p8 <= 6
+					count = 0;
+					for(i = 1; i < 9; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p1->p8 01
+					count = 0;
+					for(i = 1; i < 9; ++i)
+					{
+						if(0 == p[i] && 1 == p[(i + 1) % 9]) ++count;
+					}
+					if(count != 1) continue;
+
+					//p1 * p3 * p7 = 0  && p1 * p5 * p7 = 0
+					if(0 == p[1] * p[3] * p[7] && 0 == p[1] * p[5] * p[7])
+					{
+						flag = 1;
+						imgBuf[y * width + x] = 0;
+					}
+
+				}
+			}
+		}
+
+
+		if(flag == 0) break;
+	}
+
+	delete [] tempBuf;
+
+}
+
+void CImageProcessDoc::OnMenuitemGetthinimageclassic() 
+{
+	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 1;
+		}
+	}
+
+
+
+	DWORD start_time = GetTickCount();
+	ThinnerPavlidis(imgBuf,channel_image[0]->width,channel_image[0]->height,100);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_classic.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;
 }

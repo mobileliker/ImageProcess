@@ -214,11 +214,15 @@ BEGIN
 
         MENUITEM "GetThinImage(Quick thinning algorithm)", 
                                                 ID_MENUITEM_GETTHINIMAGEQTA
-        MENUITEM "CompleteIsolatePoint",        ID_MENUITEM_COMPLETEISOLATEPOINT
-
         MENUITEM "GetThinImage(Hilditch)",      ID_MENUITEM_GETTHINIMAGEHILDITCH
 
+        MENUITEM "GetThinImage(Hilditch2)",     ID_MENUITEM_GETTHINIMAGEHILDITCH2
+
         MENUITEM "GetThinImage(Pavlidis)",      ID_MENUITEM_GETTHINIMAGEPAVLIDIS
+
+        MENUITEM "GetThinImage(Classic)",       ID_MENUITEM_GETTHINIMAGECLASSIC
+
+        MENUITEM "CompleteIsolatePoint",        ID_MENUITEM_COMPLETEISOLATEPOINT
 
     END
     POPUP "Video"
