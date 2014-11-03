@@ -226,6 +226,12 @@ BEGIN
         MENUITEM "GetThinImage(ZhangClassic)",  ID_MENUITEM_GETTHINIMAGECLASSIC
 
         MENUITEM "GetThinImage(ZhangClassic2)", ID_MENUITEM_GETIMAGECLASSIC2
+        MENUITEM "GetThinImage(Hilditch1Classic)", 
+                                                ID_MENUITEM_GETTHINIMAGEHILDITCH1CLASSIC
+
+        MENUITEM "GetThinImage(Hilditch2Classic)", 
+                                                ID_MENUITEM_GETTHINIMAGEHILDITCH2CLASSIC
+
         MENUITEM SEPARATOR
         MENUITEM "CompleteIsolatePoint",        ID_MENUITEM_COMPLETEISOLATEPOINT
 

@@ -142,6 +142,8 @@ protected:
 	afx_msg void OnMenuitemGetthinimageclassic();
 	afx_msg void OnMenuitemGetimageclassic2();
 	afx_msg void OnMenuitemAutotest();
+	afx_msg void OnMenuitemGetthinimagehilditch1classic();
+	afx_msg void OnMenuitemGetthinimagehilditch2classic();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

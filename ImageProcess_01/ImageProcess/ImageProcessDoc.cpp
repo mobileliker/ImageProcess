@@ -9,6 +9,7 @@
 #include <fstream.h>
 #include <vector>
 #include <queue>
+#include <math.h>
 
 #include "SelectThresholdDialog.h"
 #include "SelectRGBChannelDialog.h"
@@ -114,6 +115,8 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGECLASSIC, OnMenuitemGetthinimageclassic)
 	ON_COMMAND(ID_MENUITEM_GETIMAGECLASSIC2, OnMenuitemGetimageclassic2)
 	ON_COMMAND(ID_MENUITEM_AUTOTEST, OnMenuitemAutotest)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH1CLASSIC, OnMenuitemGetthinimagehilditch1classic)
+	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH2CLASSIC, OnMenuitemGetthinimagehilditch2classic)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -6595,7 +6598,6 @@ void ThinnerClassic2(BYTE *imgBuf,int width,int height,int interator)
 void CImageProcessDoc::OnMenuitemGetimageclassic2() 
 {
 	// TODO: Add your command handler code here
-		// TODO: Add your command handler code here
 	int i;
 	int x,y;
 
@@ -6652,11 +6654,331 @@ void CImageProcessDoc::OnMenuitemGetimageclassic2()
 	timeSpan = end_time - start_time;
 }
 
+int nc8(BYTE b[])
+{
+	BYTE d[8];
+	int i;
+	int num_d = 8;
+	for(i = 0; i < num_d; ++i) { if(abs(b[i]) == 1) {d[i] = 1;} else {d[i] = 0;} }
+	int count = 0;
+	for(i = 0; i < num_d; i += 2)
+	{
+		count += (d[i] - d[i] * d[(i + 1) % num_d] * d[(i + 2) % num_d]);
+	}
+	return count;
+}
+
+
+void ThinnerHilditch1Classic(BYTE *imgBuf,int width,int height,int interator)
+{
+
+	int x,y;
+	int i;
+	int flag;
+	
+	int idx_x[] = {1,1,0,-1,-1,-1,0,1};
+	int idx_y[] = {0,-1,-1,-1,0,1,1,1};
+	int num_d = 8;
+
+
+	while(interator--)
+	{
+		flag = 0;
+
+		BYTE b[8],d[8];
+
+		int count;
+		for(y = 1; y < height - 1; ++y)
+		{
+			for(x = 1; x < width -1; ++x)
+			{
+				if(imgBuf[y * width + x] == 255)
+				{
+					for(i = 0; i < num_d; ++i)
+					{
+						if(imgBuf[(y + idx_y[i]) * width + x + idx_x[i]] == 255) b[i] = 1;
+						else if(imgBuf[(y + idx_y[i]) * width + x + idx_x[i]] == 128) b[i] = -1;
+						else b[i] = 0;
+					}
+
+					//2. 1-abs(b0) + 1 – abs(b2) + 1 – abs(b4) + 1 – abs(b6) >= 1
+					count = 0;
+					for(i = 0; i < num_d; i += 2) count += (1 - abs(b[i]));
+					if(count < 1) continue;
+					//if(((1 - abs(b[0])) + (1 - abs(b[2])) + (1 - abs(b[4])) + (1 - abs(b[6])) ) < 1) continue;
+
+					//3. abs(b0)+…+abs(b7)>=2
+					count = 0;
+					for(i = 0; i < num_d; ++i) count += abs(b[i]);
+					if(count < 2) continue;
+
+					//4. 统计b1到b8等于1的数量，该数量值必须大于1，该条件表示不能删除端点
+					count = 0;
+					for(i = 0; i < num_d; ++i) if(b[i] == 1) count++;
+					if(count < 1) continue;
+
+					//5.连通性检测，使用下面的公式：
+					//首先根据当前像素周围3*3域的值，记录d[9]数组，如果b[i]等于0，则d[i]=0， 
+					//否则d[i]=1，最后计算 d1-d1*d2*d3+d3-d3*d4*d5+d5-d5*d6*d7+d7-d7*d8*d1是否为1，
+					//为1则满足连通性，可以删除。
+					if(nc8(b) != 1) continue;
+
+
+
+					//6
+					count = 0;
+					for(i = 0; i < num_d; ++i)
+					{
+						if(b[i] != -1) count++;
+						else
+						{
+							int temp = b[i];
+							b[i] = 0;
+							if(nc8(b) == 1) count++;
+							b[i] = temp;
+						}
+					}
+					if(count != 8) continue;
+
+
+					imgBuf[y * width + x] = 128;
+					flag++;
+
+				}
+			}
+		}
+
+		if(flag)
+		{
+			for(y = 0; y < height; ++y)
+			{
+				for(x = 0; x < width; ++x)
+				{
+					if(imgBuf[y * width + x] == 128) imgBuf[y * width + x] = 0;
+				}
+			}
+		}
+		else break;
+	}
+
+
+}
+
+void CImageProcessDoc::OnMenuitemGetthinimagehilditch1classic() 
+{
+	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 255;
+		}
+	}
+
+
+
+	DWORD start_time = GetTickCount();
+	ThinnerHilditch1Classic(imgBuf,channel_image[0]->width,channel_image[0]->height,1000);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_hilditch1classic.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;	
+}
+
+
+void ThinnerHilditch2Classic(BYTE *imgBuf,int width,int height,int interator)
+{
+	BYTE *tempBuf = new BYTE[width * height];
+
+	int x = 0,y = 0;
+	int i = 0;
+	int flag = 0;
+	
+	int idx_x[] = {0,1,1,1,0,-1,-1,-1};
+	int idx_y[] = {-1,-1,0,1,1,1,0,-1};
+
+
+	while(interator--)
+	{
+		BYTE p[8];
+		int count = 0;
+
+		flag = 0;
+
+		for(y = 0; y < height; ++y)
+		{
+			for(x = 0; x < width; ++x)
+			{
+				tempBuf[y * width + x] = imgBuf[y * width + x];
+			}
+		}
+
+		for(y = 2; y < height - 2; ++y)
+		{
+			for(x = 2; x < width - 2; ++x)
+			{
+				if(tempBuf[y * width + x] == 1)
+				{
+					for(i = 0; i < 8; ++i) p[i] = tempBuf[(y + idx_y[i]) * width + (x + idx_x[i])];
+
+					//2 <= p0 + p2 + .. + p7 <= 6
+					count = 0;
+					for(i = 0; i < 8; ++i) count += p[i];
+					if(count < 2 || count > 6) continue;
+
+					//p0->p8 01
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == (p[(i + 1) % 8] - p[i])) ++count;
+					}
+					if(count != 1) continue;
+
+					BYTE b[8];
+					int xx,yy;
+
+					//p0.p2.p6 = 0 or A(p0)!=1
+					xx = x + idx_x[0];
+					yy = y + idx_y[0];
+					for(i = 0; i < 8; ++i) b[i] = tempBuf[(yy + idx_y[i]) * width + (xx + idx_x[i])];
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == b[(i + 1) % 8] - b[i]) count++;
+					}
+					if(!((p[0] * p[2] * p[6] == 0) || (count != 1))) continue;
+
+					//p0.p2.p4 = 0 or A(p2)!=1
+					xx = x + idx_x[2];
+					yy = y + idx_y[2];
+					for(i = 0; i < 8; ++i) b[i] = tempBuf[(yy + idx_y[i]) * width + (xx + idx_x[i])];
+					count = 0;
+					for(i = 0; i < 8; ++i)
+					{
+						if(1 == b[(i + 1) % 8] - b[i]) count++;
+					}
+					if(!((p[0] * p[2] * p[4]) == 0 || (count != 1))) continue;
+
+
+					imgBuf[y * width + x] = 0;
+					flag++;
+				}
+			}
+		}
+
+		if(flag == 0) break;
+	}
+
+	delete [] tempBuf;
+
+}
+
+void CImageProcessDoc::OnMenuitemGetthinimagehilditch2classic() 
+{
+	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *channel_image[3];
+	for(i = 0; i < 3; ++i)
+	{
+		channel_image[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+		channel_image[i]->origin = pImg->origin;
+	}
+	cvSplit(pImg,channel_image[0],channel_image[1],channel_image[2],0);
+
+	IplImage *thin_image = cvCreateImage(cvGetSize(channel_image[0]),channel_image[0]->depth,1);
+	thin_image->origin = channel_image[0]->origin;
+
+	BYTE *imgBuf  = new BYTE[channel_image[0]->height * channel_image[0]->width];
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(channel_image[0],y,x);
+			if(scalar.val[0] == 0) imgBuf[y * channel_image[0]->width + x] = 0;
+			else imgBuf[y * channel_image[0]->width + x] = 1;
+		}
+	}
+
+
+
+	DWORD start_time = GetTickCount();
+	ThinnerHilditch2Classic(imgBuf,channel_image[0]->width,channel_image[0]->height,1000);
+	DWORD end_time = GetTickCount();
+
+	for(y = 0; y < channel_image[0]->height; ++y)
+	{
+		for(x = 0; x < channel_image[0]->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(thin_image,y,x);
+			if(imgBuf[y * channel_image[0]->width + x] == 0) scalar.val[0] = 0;
+			else scalar.val[0] = 255;
+			cvSet2D(thin_image,y,x,scalar);
+		}
+	}
+
+	delete [] imgBuf;
+
+	m_image.CopyOf(thin_image,thin_image->nChannels);
+
+	cvSaveImage("D://log/thin_image_hilditch2classic.bmp",thin_image);
+
+	UpdateAllViews(NULL);
+
+	timeSpan = end_time - start_time;	
+}
+
 void CImageProcessDoc::OnMenuitemAutotest() 
 {
 	// TODO: Add your command handler code here
 	OnMenuitemGetgrayimage();
 	OnMenuitemGetreverseimage();
 	OnMenuitemGetthresholdimageotsu();
-	OnMenuitemGetimageclassic2();
+	OnMenuitemGetthinimagehilditch2classic();
 }
+
+
+
+
