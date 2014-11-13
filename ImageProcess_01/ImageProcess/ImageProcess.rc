@@ -277,6 +277,26 @@ BEGIN
         MENUITEM "VideoPrewittOperator",        ID_MENUITEM_VIDEOPREWITTOPERATOR
 
     END
+    POPUP "Vein"
+    BEGIN
+        POPUP "Pretreatment"
+        BEGIN
+            POPUP "Channelizing"
+            BEGIN
+                MENUITEM "Graying",                     ID_MENUITEM_VPC_GRAYING
+
+                MENUITEM "RGB",                         ID_MENUITEM_VPD_RGB
+                MENUITEM "HSV",                         ID_MENUITEM_VPC_HSV
+            END
+            POPUP "Denoising"
+            BEGIN
+                MENUITEM "MeanFiltering",               ID_MENUITEM_VPD_MEANFILTERING
+
+            END
+        END
+        MENUITEM "Segmentation",                65535
+        MENUITEM "VeinAutoTest",                ID_MENUITEM_VeinAutoTest
+    END
     POPUP "Soybean"
     BEGIN
         POPUP "Pretreatment"

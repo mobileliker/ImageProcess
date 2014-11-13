@@ -144,6 +144,11 @@ protected:
 	afx_msg void OnMenuitemAutotest();
 	afx_msg void OnMenuitemGetthinimagehilditch1classic();
 	afx_msg void OnMenuitemGetthinimagehilditch2classic();
+	afx_msg void OnMenuitemVpcGraying();
+	afx_msg void OnMENUITEMVeinAutoTest();
+	afx_msg void OnMenuitemVpdMeanfiltering();
+	afx_msg void OnMenuitemVpdRgb();
+	afx_msg void OnMenuitemVpcHsv();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

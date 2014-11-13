@@ -117,6 +117,11 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_AUTOTEST, OnMenuitemAutotest)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH1CLASSIC, OnMenuitemGetthinimagehilditch1classic)
 	ON_COMMAND(ID_MENUITEM_GETTHINIMAGEHILDITCH2CLASSIC, OnMenuitemGetthinimagehilditch2classic)
+	ON_COMMAND(ID_MENUITEM_VPC_GRAYING, OnMenuitemVpcGraying)
+	ON_COMMAND(ID_MENUITEM_VeinAutoTest, OnMENUITEMVeinAutoTest)
+	ON_COMMAND(ID_MENUITEM_VPD_MEANFILTERING, OnMenuitemVpdMeanfiltering)
+	ON_COMMAND(ID_MENUITEM_VPD_RGB, OnMenuitemVpdRgb)
+	ON_COMMAND(ID_MENUITEM_VPC_HSV, OnMenuitemVpcHsv)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -6982,3 +6987,108 @@ void CImageProcessDoc::OnMenuitemAutotest()
 
 
 
+
+void CImageProcessDoc::OnMenuitemVpcGraying() 
+{
+	// TODO: Add your command handler code here
+	timeSpan = -1.0;
+
+	OnMenuitemGetgrayimage();
+	if(timeSpan != -1.0)
+	{
+		ofstream res_file("D://log/res_time.txt");
+		res_file << timeSpan << " ms" << endl;
+		res_file << timeSpan / 1000 << " s" << endl;
+		res_file.close();
+
+		char str[200];
+		sprintf(str,"Finish Get Gray Image.Total Use time:%lf ms",timeSpan);
+		AfxMessageBox(str);
+	}
+}
+
+
+void CImageProcessDoc::OnMenuitemVpdMeanfiltering() 
+{
+	// TODO: Add your command handler code here
+	timeSpan = -1.0;
+
+	OnMenuitemSmoothfiltering();
+
+	if(timeSpan != -1.0)
+	{
+		ofstream res_file("D://log/res_time.txt");
+		res_file << timeSpan << " ms" << endl;
+		res_file << timeSpan / 1000 << " s" << endl;
+		res_file.close();
+
+		char str[200];
+		sprintf(str,"Finish Smooth Filter.Use time:%lf ms",timeSpan);
+		AfxMessageBox(str);
+	}
+}
+
+
+
+void CImageProcessDoc::OnMenuitemVpdRgb() 
+{
+	// TODO: Add your command handler code here
+	int i;
+
+	IplImage *pImg = m_image.GetImage();
+
+	CSelectRGBChannelDialog dialog;
+	dialog.m_channel = 2;
+
+	if(dialog.DoModal() == IDOK)
+	{
+		IplImage* channel_img[3];
+
+		for(i = 0;i < 3; ++i)
+		{
+			channel_img[i] = cvCreateImage(cvGetSize(pImg),pImg->depth,1);
+			if(channel_img[i]->origin != pImg->origin) channel_img[i]->origin = pImg->origin;
+		}
+
+
+		DWORD start_time = GetTickCount();
+		cvSplit(pImg,channel_img[0],channel_img[1],channel_img[2],0);
+		DWORD end_time = GetTickCount();
+
+
+		char channel_names[] = "RGB";
+		for(i = 0; i < 3; ++i)
+		{
+			char str[100];
+			sprintf(str,"D://log/%c_channel_image.bmp",channel_names[i]);
+			cvSaveImage(str,channel_img[i]);
+
+			//sprintf(str,"%c Channel Image",channel_names[i]);
+			//cvNamedWindow(str);
+			//cvShowImage(str,channel_img[i]);
+		}
+
+		m_image.CopyOf(channel_img[dialog.m_channel],channel_img[dialog.m_channel]->nChannels);
+
+		UpdateAllViews(NULL);
+
+		timeSpan = end_time - start_time;
+	}
+
+}
+
+
+void CImageProcessDoc::OnMenuitemVpcHsv() 
+{
+	// TODO: Add your command handler code here
+	OnMenuitemGethsvchannelimage();
+
+	AfxMessageBox("Finish Get HSV Channel Image");
+}
+
+void CImageProcessDoc::OnMENUITEMVeinAutoTest() 
+{
+	// TODO: Add your command handler code here
+	OnMenuitemVpcGraying();
+	OnMenuitemSmoothfiltering();
+}
