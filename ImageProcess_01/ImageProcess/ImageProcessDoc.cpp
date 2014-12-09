@@ -122,6 +122,7 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VPD_MEANFILTERING, OnMenuitemVpdMeanfiltering)
 	ON_COMMAND(ID_MENUITEM_VPD_RGB, OnMenuitemVpdRgb)
 	ON_COMMAND(ID_MENUITEM_VPC_HSV, OnMenuitemVpcHsv)
+	ON_COMMAND(ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL2, OnMenuitemGetthresholdimagemannal2)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -7091,4 +7092,145 @@ void CImageProcessDoc::OnMENUITEMVeinAutoTest()
 	// TODO: Add your command handler code here
 	OnMenuitemVpcGraying();
 	OnMenuitemSmoothfiltering();
+}
+
+const int GrayScale = 255;
+int otsuThreshold(IplImage *frame)
+{
+	int width = frame->width;
+	int height = frame->height;
+	int pixelCount[GrayScale];
+	float pixelPro[GrayScale];
+	int i, j, pixelSum = width * height, threshold = 0;
+	uchar* data = (uchar*)frame->imageData;
+
+	for(i = 0; i < GrayScale; i++)
+	{
+		pixelCount[i] = 0;
+		pixelPro[i] = 0;
+	}
+
+	//统计灰度级中每个像素在整幅图像中的个数
+	for(i = 0; i < height; i++)
+	{
+		for(j = 0;j < width;j++)
+		{
+			pixelCount[(int)data[i * width + j]]++;
+		}
+	}
+	
+	//计算每个像素在整幅图像中的比例
+	for(i = 0; i < GrayScale; i++)
+	{
+		pixelPro[i] = (float)pixelCount[i] / pixelSum;
+	}
+
+	//遍历灰度级[0,255]
+	float w0, w1, u0tmp, u1tmp, u0, u1, u, 
+			deltaTmp, deltaMax = 0;
+	for(i = 0; i < GrayScale; i++)
+	{
+		w0 = w1 = u0tmp = u1tmp = u0 = u1 = u = deltaTmp = 0;
+		for(j = 0; j < GrayScale; j++)
+		{
+			if(j <= i)   //背景部分
+			{
+				w0 += pixelPro[j];
+				u0tmp += j * pixelPro[j];
+			}
+			else   //前景部分
+			{
+				w1 += pixelPro[j];
+				u1tmp += j * pixelPro[j];
+			}
+		}
+		u0 = u0tmp / w0;
+		u1 = u1tmp / w1;
+		u = u0tmp + u1tmp;
+		deltaTmp = 
+			w0 * pow((u0 - u), 2) + w1 * pow((u1 - u), 2);
+		if(deltaTmp > deltaMax)
+		{
+			deltaMax = deltaTmp;
+			threshold = i;
+		}
+	}
+	return threshold;
+}
+
+void CImageProcessDoc::OnMenuitemGetthresholdimagemannal2() 
+{
+	// TODO: Add your command handler code here
+	IplImage *pImg = m_image.GetImage();
+	
+	IplImage* r_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* g_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* b_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	cvSplit(pImg,r_plane,g_plane,b_plane,0);
+
+	IplImage *threshold_image = cvCreateImage(cvGetSize(r_plane),IPL_DEPTH_8U,1);
+
+	//cal threshold reference value
+	//int hist_size = 256;
+	//int hist_height = 256;
+	//int hist_sizes[] = {hist_size};
+	//float range[] = {0,255};
+	//float* ranges[] = {range};
+
+
+	//CvHistogram *s_hist = cvCreateHist(1,hist_sizes,CV_HIST_ARRAY,ranges,1);//create
+	//cvCalcHist(&r_plane,s_hist,0,0);
+	//cvNormalizeHist(s_hist,1.0);
+
+	//double threshold = icvGetThreshVal_Otsu(s_hist);
+	double threshold = otsuThreshold(r_plane);
+	//cvReleaseHist(&s_hist);
+	int threshold_type = 0;
+
+	CSelectThresholdDialog dialog;
+	dialog.m_threshold = threshold;
+	dialog.m_threshold_type = threshold_type;
+
+
+	if(dialog.DoModal() == IDOK)
+	{
+		threshold = dialog.m_threshold;
+		threshold_type = dialog.m_threshold_type;
+
+		
+		DWORD start_time = GetTickCount();
+		if(threshold_type == 0)
+		{
+			cvThreshold(r_plane,threshold_image,threshold,255,CV_THRESH_BINARY);
+		}
+		else
+		{
+			cvThreshold(r_plane,threshold_image,threshold,255,CV_THRESH_BINARY_INV);
+		}
+		DWORD end_time = GetTickCount();
+
+		//int x,y;
+		//CvScalar scalar;
+		//ofstream outfile1("D://log/threshold_image_point.txt");
+		//for(x = 0; x < threshold_image->width; x++)
+		//{
+		//	for(y = 0; y < threshold_image->height; y++)
+		//	{
+		//		scalar = cvGet2D(threshold_image,y,x);
+		//		outfile1<<"x="<<x<<",y="<<y<<",value="<<scalar.val[0]<<endl;
+		//	}
+		//}
+		//outfile1.close();
+
+		m_image.CopyOf(threshold_image,threshold_image->nChannels);
+
+		cvSaveImage("D://log/threshold_image.bmp",threshold_image);
+
+		UpdateAllViews(NULL);
+
+		timeSpan = end_time - start_time;
+
+		//AfxMessageBox("Finish Get threshold Image(Mannal).");
+	}
+
 }

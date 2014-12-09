@@ -20,11 +20,11 @@ Resource2=IDR_MAINFRAME
 Resource3=IDR_SKELETTYPE
 Class5=CChildFrame
 Class6=CAboutDlg
-Resource4=IDR_SKELETTYPE (English (U.S.))
-Resource5=IDD_DIALOG_SELECTTHRESHOLD
-Resource6=IDD_ABOUTBOX (English (U.S.))
+Resource4=IDD_DIALOG_SELECTTHRESHOLD
+Resource5=IDR_SKELETTYPE (English (U.S.))
+Resource6=IDD_DIALOG_SELECTSIZE
 Class7=CSelectSizeDialog
-Resource7=IDD_DIALOG_SELECTSIZE
+Resource7=IDD_ABOUTBOX (English (U.S.))
 Class8=CSelectThresholdDialog
 Resource8=IDR_MAINFRAME (English (U.S.))
 
@@ -48,7 +48,7 @@ Type=0
 HeaderFile=SkeletonView.h
 ImplementationFile=SkeletonView.cpp
 Filter=C
-LastObject=ID_MENUITEM_GETBCANNELS
+LastObject=ID_MENUITEM_GETTHINIMAGE
 BaseClass=CView
 VirtualFilter=VWC
 

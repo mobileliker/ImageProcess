@@ -149,6 +149,7 @@ protected:
 	afx_msg void OnMenuitemVpdMeanfiltering();
 	afx_msg void OnMenuitemVpdRgb();
 	afx_msg void OnMenuitemVpcHsv();
+	afx_msg void OnMenuitemGetthresholdimagemannal2();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

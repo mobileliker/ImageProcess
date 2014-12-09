@@ -20,15 +20,15 @@ Resource2=IDR_MAINFRAME
 Resource3=IDR_SEGMENTYPE
 Class5=CChildFrame
 Class6=CAboutDlg
-Resource4=IDD_DIALOG_CONTOURPARAMETER
-Resource5=IDD_ABOUTBOX (English (U.S.))
+Resource4=IDR_MAINFRAME (English (U.S.))
+Resource5=IDD_DIALOG_CONTOURPARAMETER
 Resource6=IDR_SEGMENTYPE (English (U.S.))
 Class7=COpeningParameterDialog
-Resource7=IDD_DIALOG_WATERSHED (English (U.S.))
+Resource7=IDD_DIALOG_OPENINGPARAMETER (English (U.S.))
 Class8=CWatershedParameterDialog
-Resource8=IDD_DIALOG_OPENINGPARAMETER (English (U.S.))
+Resource8=IDD_ABOUTBOX (English (U.S.))
 Class9=CContourParameterDialog
-Resource9=IDR_MAINFRAME (English (U.S.))
+Resource9=IDD_DIALOG_WATERSHED (English (U.S.))
 
 [CLS:CSegmentationApp]
 Type=0

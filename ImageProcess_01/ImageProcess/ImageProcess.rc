@@ -199,6 +199,8 @@ BEGIN
 
         MENUITEM "Binarization(Mannal)",        ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL
 
+        MENUITEM "Binarization(Mannal2)",       ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL2
+
         MENUITEM SEPARATOR
         MENUITEM "RobertOperator",              ID_MENUITEM_ROBERTOPERATOR
         MENUITEM "PrewittOperator",             ID_MENUITEM_PREWITTOPERATOR
