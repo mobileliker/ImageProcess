@@ -123,6 +123,13 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VPD_RGB, OnMenuitemVpdRgb)
 	ON_COMMAND(ID_MENUITEM_VPC_HSV, OnMenuitemVpcHsv)
 	ON_COMMAND(ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL2, OnMenuitemGetthresholdimagemannal2)
+	ON_COMMAND(ID_MENUITEM_LPR1_INIT, OnMenuitemLpr1Init)
+	ON_COMMAND(ID_MENUITEM_LPR1_HSVGRAY, OnMenuitemLpr1Hsvgray)
+	ON_COMMAND(ID_MENUITEM_LPR1_MORPHOLOGY, OnMenuitemLpr1Morphology)
+	ON_COMMAND(ID_MENUITEM_LPR1_LOCATIONCOARSE, OnMenuitemLpr1Locationcoarse)
+	ON_COMMAND(ID_MENUITEM_LPR1_GRAY, OnMenuitemLpr1Gray)
+	ON_COMMAND(ID_MENUITEM_LPR1_THRESHOLD, OnMenuitemLpr1Threshold)
+	ON_COMMAND(ID_MENUITEM_OPENEXDEFAULT, OnMenuitemOpenexdefault)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -215,12 +222,12 @@ BOOL CImageProcessDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		return FALSE;
 	
 	// TODO: Add your specialized creation code here
-	if(CheckExtendName(lpszPathName,"bmp") || CheckExtendName(lpszPathName,"jpg"))
+	if(CFileUtil::CheckExtendName(lpszPathName,"bmp") || CFileUtil::CheckExtendName(lpszPathName,"jpg") || CFileUtil::CheckExtendName(lpszPathName,"png"))
 	{
 		this->type_flag = STYLE_IMAGE;
 		m_image.Load(lpszPathName);
 	}	
-	else if(CheckExtendName(lpszPathName,"avi"))
+	else if(CFileUtil::CheckExtendName(lpszPathName,"avi"))
 	{
 		this->type_flag = STYLE_VIDEO;
 
@@ -7233,4 +7240,145 @@ void CImageProcessDoc::OnMenuitemGetthresholdimagemannal2()
 		//AfxMessageBox("Finish Get threshold Image(Mannal).");
 	}
 
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Init() 
+{
+	// TODO: Add your command handler code here
+	IplImage *pImg = m_image.GetImage();
+		BYTE *imgData = new BYTE[pImg->width * pImg->height * 3];
+		for(int y = 0; y < pImg->height; ++y)
+		{
+			for(int x = 0; x < pImg->width; ++x)
+			{
+				CvScalar scalar = cvGet2D(pImg, y, x);
+				imgData[(y * pImg->width + x) * 3] = (BYTE)scalar.val[0];
+				imgData[(y * pImg->width + x) * 3 + 1] = (BYTE)scalar.val[1];
+				imgData[(y * pImg->width + x) * 3 + 2] = (BYTE)scalar.val[2];
+			}
+		}
+	m_lprm.init(imgData, pImg->height, pImg->width);
+	
+	//AfxMessageBox("Finish Init");
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Hsvgray() 
+{
+	// TODO: Add your command handler code here
+	BYTE *mg = m_lprm.HSVGray();
+
+	IplImage *pImg = m_image.GetImage();
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			scalar.val[0] = mg[y * pImg->width + x];
+			scalar.val[1] = mg[y * pImg->width + x];
+			scalar.val[2] = mg[y * pImg->width + x];
+			cvSet2D(pImg,y,x,scalar);
+		}
+	}
+
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Morphology() 
+{
+	// TODO: Add your command handler code here
+	BYTE *mg2 = m_lprm.Morphology();
+
+	IplImage *pImg = m_image.GetImage();
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			scalar.val[0] = mg2[y * pImg->width + x];
+			scalar.val[1] = mg2[y * pImg->width + x];
+			scalar.val[2] = mg2[y * pImg->width + x];
+			cvSet2D(pImg,y,x,scalar);
+		}
+	}
+
+	UpdateAllViews(NULL);	
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Locationcoarse() 
+{
+	// TODO: Add your command handler code here
+	BYTE *mg3 = m_lprm.CoarseLocation();
+
+	IplImage *pImg = m_image.GetImage();
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			for(int i = 0; i < pImg->nChannels; ++i) scalar.val[i] = mg3[(y * pImg->width + x) * pImg->nChannels + i];
+			cvSet2D(pImg,y,x,scalar);
+		}
+	}
+
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Gray() 
+{
+	// TODO: Add your command handler code here
+	BYTE *imgData2 = m_lprm.Gray();
+
+	IplImage *pImg = m_image.GetImage();
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			scalar.val[0] = imgData2[y * pImg->width + x];
+			scalar.val[1] = imgData2[y * pImg->width + x];
+			scalar.val[2] = imgData2[y * pImg->width + x];
+			cvSet2D(pImg,y,x,scalar);
+		}
+	}
+
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemLpr1Threshold() 
+{
+	// TODO: Add your command handler code here
+	BYTE *otsu_img = m_lprm.OTSU();
+
+	IplImage *pImg = m_image.GetImage();
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			scalar.val[0] = otsu_img[y * pImg->width + x];
+			scalar.val[1] = otsu_img[y * pImg->width + x];
+			scalar.val[2] = otsu_img[y * pImg->width + x];
+			cvSet2D(pImg,y,x,scalar);
+		}
+	}
+
+	UpdateAllViews(NULL);		
+}
+
+void CImageProcessDoc::OnMenuitemOpenexdefault() 
+{
+	// TODO: Add your command handler code here
+	IplImage *pImg = m_image.GetImage();
+
+	IplImage *dst = cvCreateImage(cvGetSize(pImg),pImg->depth,pImg->nChannels);
+	IplImage *temp = cvCreateImage(cvGetSize(pImg),pImg->depth,pImg->nChannels);
+
+	cvMorphologyEx(pImg, dst, temp, NULL, CV_MOP_OPEN, 1);
+	
+	m_image.CopyOf(dst,dst->nChannels);
+
+	cvReleaseImage(&dst);
+	cvReleaseImage(&temp);	
+	
+	UpdateAllViews(NULL);	
 }

@@ -189,6 +189,11 @@ BEGIN
 
         MENUITEM "GetHistogram",                ID_MENUITEM_GETHisTOGRAM
         MENUITEM "SmoothFiltering",             ID_MENUITEM_SMOOTHFILTERING
+        POPUP "Morphology"
+        BEGIN
+            MENUITEM "OpenEx(Default)",             ID_MENUITEM_OPENEXDEFAULT
+
+        END
         MENUITEM SEPARATOR
         MENUITEM "Binarization(mode)",          ID_MENUITEM_BINARIZATIONMODE
         MENUITEM "Binarization(Max Entropy)",   ID_MENUITEM_BINARIZATIONMAXENTROPY
@@ -278,6 +283,29 @@ BEGIN
 
         MENUITEM "VideoPrewittOperator",        ID_MENUITEM_VIDEOPREWITTOPERATOR
 
+    END
+    POPUP "LicensePlateRecognition"
+    BEGIN
+        POPUP "Recognition1"
+        BEGIN
+            MENUITEM "Init",                        ID_MENUITEM_LPR1_INIT
+            POPUP "Pretreatment"
+            BEGIN
+                MENUITEM "HSVGray",                     ID_MENUITEM_LPR1_HSVGRAY
+
+                MENUITEM "Morphology",                  ID_MENUITEM_LPR1_MORPHOLOGY
+
+                MENUITEM "Location(Coarse)",            ID_MENUITEM_LPR1_LOCATIONCOARSE
+
+            END
+            POPUP "Segmentation"
+            BEGIN
+                MENUITEM "Gray",                        ID_MENUITEM_LPR1_GRAY
+
+                MENUITEM "Threshold",                   ID_MENUITEM_LPR1_THRESHOLD
+
+            END
+        END
     END
     POPUP "Vein"
     BEGIN

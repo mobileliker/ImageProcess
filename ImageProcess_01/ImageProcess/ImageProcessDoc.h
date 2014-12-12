@@ -13,6 +13,12 @@
 #define STYLE_VIDEO 1
 
 #include <vector>
+#include <fstream.h>
+
+#include "FileUtil.h"
+#include "ColorTransform.h"
+#include "LicensePlateRecognitionMain.h"
+#include "ImageFilter.h"
 
 using std::vector;
 
@@ -35,6 +41,9 @@ public:
 
 	double timeSpan;
 	vector<double> v_timeSpan;
+
+private:
+	CLicensePlateRecognitionMain m_lprm;
 
 // Operations
 public:
@@ -150,6 +159,13 @@ protected:
 	afx_msg void OnMenuitemVpdRgb();
 	afx_msg void OnMenuitemVpcHsv();
 	afx_msg void OnMenuitemGetthresholdimagemannal2();
+	afx_msg void OnMenuitemLpr1Init();
+	afx_msg void OnMenuitemLpr1Hsvgray();
+	afx_msg void OnMenuitemLpr1Morphology();
+	afx_msg void OnMenuitemLpr1Locationcoarse();
+	afx_msg void OnMenuitemLpr1Gray();
+	afx_msg void OnMenuitemLpr1Threshold();
+	afx_msg void OnMenuitemOpenexdefault();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

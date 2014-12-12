@@ -92,11 +92,27 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\Binaryzation.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Canny.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\ChildFrm.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ColorTransform.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\FileUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ImageFilter.cpp
 # End Source File
 # Begin Source File
 
@@ -116,7 +132,15 @@ SOURCE=.\ImageProcessView.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\LicensePlateRecognitionMain.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\MainFrm.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathUtil.cpp
 # End Source File
 # Begin Source File
 
@@ -153,11 +177,27 @@ SOURCE=.\StdAfx.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\Binaryzation.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Canny.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\ChildFrm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ColorTransform.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\FileUtil.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ImageFilter.h
 # End Source File
 # Begin Source File
 
@@ -173,7 +213,15 @@ SOURCE=.\ImageProcessView.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\LicensePlateRecognitionMain.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\MainFrm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\MathUtil.h
 # End Source File
 # Begin Source File
 

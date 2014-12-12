@@ -114,6 +114,13 @@
 #define ID_MENUITEM_VPD_RGB             32874
 #define ID_MENUITEM_VPC_HSV             32875
 #define ID_MENUITEM_GETTHRESHOLDIMAGEMANNAL2 32876
+#define ID_MENUITEM_LPR1_INIT           32879
+#define ID_MENUITEM_LPR1_HSVGRAY        32880
+#define ID_MENUITEM_LPR1_MORPHOLOGY     32881
+#define ID_MENUITEM_LPR1_LOCATIONCOARSE 32882
+#define ID_MENUITEM_LPR1_GRAY           32884
+#define ID_MENUITEM_LPR1_THRESHOLD      32885
+#define ID_MENUITEM_OPENEXDEFAULT       32887
 
 // Next default values for new objects
 // 
@@ -121,7 +128,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32877
+#define _APS_NEXT_COMMAND_VALUE         32888
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
