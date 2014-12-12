@@ -166,6 +166,11 @@ protected:
 	afx_msg void OnMenuitemLpr1Gray();
 	afx_msg void OnMenuitemLpr1Threshold();
 	afx_msg void OnMenuitemOpenexdefault();
+	afx_msg void OnMenuitemFilterLaplace();
+	afx_msg void OnMenuitemCpGray();
+	afx_msg void OnMenuitemCpBinary();
+	afx_msg void OnMenuitemCpSegmentation();
+	afx_msg void OnMenuitemLprAutotest();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

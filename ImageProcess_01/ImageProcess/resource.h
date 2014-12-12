@@ -121,6 +121,11 @@
 #define ID_MENUITEM_LPR1_GRAY           32884
 #define ID_MENUITEM_LPR1_THRESHOLD      32885
 #define ID_MENUITEM_OPENEXDEFAULT       32887
+#define ID_MENUITEM_FILTER_LAPLACE      32890
+#define ID_MENUITEM_CP_GRAY             32892
+#define ID_MENUITEM_CP_BINARY           32893
+#define ID_MENUITEM_CP_SEGMENTATION     32894
+#define ID_MENUITEM_LPR_AUTOTEST        32895
 
 // Next default values for new objects
 // 
@@ -128,7 +133,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32888
+#define _APS_NEXT_COMMAND_VALUE         32896
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

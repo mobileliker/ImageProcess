@@ -16,6 +16,7 @@
 #include "ImageFilter.h"
 #include "Binaryzation.h"
 
+
 struct Point
 {
 	int y;

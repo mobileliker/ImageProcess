@@ -130,6 +130,11 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_LPR1_GRAY, OnMenuitemLpr1Gray)
 	ON_COMMAND(ID_MENUITEM_LPR1_THRESHOLD, OnMenuitemLpr1Threshold)
 	ON_COMMAND(ID_MENUITEM_OPENEXDEFAULT, OnMenuitemOpenexdefault)
+	ON_COMMAND(ID_MENUITEM_FILTER_LAPLACE, OnMenuitemFilterLaplace)
+	ON_COMMAND(ID_MENUITEM_CP_GRAY, OnMenuitemCpGray)
+	ON_COMMAND(ID_MENUITEM_CP_BINARY, OnMenuitemCpBinary)
+	ON_COMMAND(ID_MENUITEM_CP_SEGMENTATION, OnMenuitemCpSegmentation)
+	ON_COMMAND(ID_MENUITEM_LPR_AUTOTEST, OnMenuitemLprAutotest)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -7381,4 +7386,263 @@ void CImageProcessDoc::OnMenuitemOpenexdefault()
 	cvReleaseImage(&temp);	
 	
 	UpdateAllViews(NULL);	
+}
+
+void CImageProcessDoc::OnMenuitemFilterLaplace() 
+{
+	// TODO: Add your command handler code here
+	int i;
+	int x,y;
+	
+	CSelectSize dialog;
+	dialog.m_size = 3;
+
+	if(dialog.DoModal())
+	{
+
+		//char str[100];
+		//sprintf(str, "%d", size);
+		//AfxMessageBox(str);
+
+		IplImage *pImg = m_image.GetImage();
+
+		IplImage *src = cvCreateImage(cvGetSize(pImg), pImg->depth, 1);
+
+		cvCvtColor(pImg, src, CV_BGR2GRAY);
+
+		IplImage *dst16 = cvCreateImage(cvGetSize(pImg), IPL_DEPTH_16S, 1);
+		IplImage *dst = cvCreateImage(cvGetSize(pImg), pImg->depth, 1);
+
+		cvLaplace(src, dst16, dialog.m_size);
+		
+		cvConvertScaleAbs(dst16,dst,1,0);
+
+		m_image.CopyOf(dst, dst->nChannels);
+
+		UpdateAllViews(NULL);
+
+		cvReleaseImage(&dst);
+		cvReleaseImage(&dst16);
+		cvReleaseImage(&src);
+	}
+
+
+}
+
+void CImageProcessDoc::OnMenuitemCpGray() 
+{
+	// TODO: Add your command handler code here
+	OnMenuitemGetgrayimage();
+}
+
+void CImageProcessDoc::OnMenuitemCpBinary() 
+{
+	// TODO: Add your command handler code here
+	IplImage *pImg = m_image.GetImage();
+	
+	IplImage* r_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* g_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* b_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	cvSplit(pImg,r_plane,g_plane,b_plane,0);
+
+	IplImage *threshold_image = cvCreateImage(cvGetSize(r_plane),IPL_DEPTH_8U,1);
+
+	int y,x;
+	for(y = 0; y < r_plane->height; ++y)
+	{
+		for(x = 0; x < r_plane->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(r_plane, y, x);
+			if(scalar.val[0] >= 70) scalar.val[0] = 255;
+			else scalar.val[0] = 0;
+			cvSet2D(threshold_image, y, x, scalar);
+		}
+	}
+
+	m_image.CopyOf(threshold_image,threshold_image->nChannels);
+
+	cvSaveImage("D://log/threshold_image.bmp",threshold_image);
+
+	UpdateAllViews(NULL);
+
+
+}
+
+void CImageProcessDoc::OnMenuitemCpSegmentation() 
+{
+	// TODO: Add your command handler code here
+	OnMenuitemGetreverseimage();
+
+	IplImage *pImg = m_image.GetImage();
+	
+	IplImage* r_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* g_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	IplImage* b_plane = cvCreateImage( cvGetSize(pImg), 8, 1 );
+	cvSplit(pImg,r_plane,g_plane,b_plane,0);
+
+	int width = r_plane->width;
+	int height = r_plane->height;
+
+	//char *src = r_plane->imageData;
+	int y,x;
+	BYTE *src = new BYTE[width * height];
+	for(y = 0; y < height; ++y)
+	{
+		for(x = 0; x < width; ++x)
+		{
+			CvScalar scalar = cvGet2D(r_plane, y, x);
+			src[y * width + x] = scalar.val[0];
+		}
+	}
+
+	std::vector<Area> v_area;
+
+	const int size = 1;
+	int i;
+
+	int *arr_mark = new int[width * height];
+	memset(arr_mark, 0, sizeof(int) * width * height);
+
+
+	int idx_flag = 1;
+	for(y = size; y < height - size; ++y)
+	{
+		for(x = size; x < width - size; ++x)
+		{
+			if(src[y * width + x] != 0 && arr_mark[y * width + x] == 0)
+			{
+				Area area;
+				area.left = x;
+				area.right = x;
+				area.top = y;
+				area.bottom = y;
+
+				std::queue<Point> q_point;
+				Point p;
+				p.x = x;
+				p.y = y;
+				arr_mark[y * width + x] = idx_flag;
+				q_point.push(p);
+
+				int idx_x[] = {0, 1, 1, 1, 0, -1, -1, -1};
+				int idx_y[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+				int idx_n = 8;
+
+				while(!q_point.empty())
+				{
+					p = q_point.front();
+					q_point.pop();
+
+					if(area.left > p.x) area.left = p.x;
+					if(area.right < p.x) area.right = p.x;
+					if(area.top > p.y) area.top = p.y;
+					if(area.bottom < p.y) area.bottom = p.y;
+
+					for(i = 0; i < idx_n; ++i)
+					{
+						if((p.y + idx_y[i]) < size || (p.y + idx_y[i]) >= (height - size) || (p.x + idx_x[i]) < size || (p.x + idx_x[i]) >= (width - size)) continue;
+						if(src[(p.y + idx_y[i]) * width + (p.x + idx_x[i])] != 0 && arr_mark[(p.y + idx_y[i]) * width + (p.x + idx_x[i])] == 0)
+						{
+							Point pp;
+							pp.x = p.x + idx_x[i];
+							pp.y = p.y + idx_y[i];
+							arr_mark[(p.y + idx_y[i]) * width + (p.x + idx_x[i])] = idx_flag;
+							q_point.push(pp);
+						}
+					}
+				}
+
+				//if((area.right - area.left) * (area.bottom - area.top) >= 1500 
+				//	&& 1.5 * (area.bottom - area.top) <= (area.right - area.left)
+				//	&& (area.right - area.left) <= 5.5 * (area.bottom - area.top))
+				v_area.push_back(area);
+				idx_flag++;
+			}
+		}
+	}
+
+	for(i = 0; i < v_area.size(); ++i)
+	{
+		if((v_area[i].right - v_area[i].left) * (v_area[i].bottom - v_area[i].top) <= 10) continue;
+		IplImage *out = cvCreateImage(cvSize(v_area[i].right - v_area[i].left + 1, v_area[i].bottom - v_area[i].top + 1), IPL_DEPTH_8U, 1);
+		cvZero(out);
+		for(y = v_area[i].top; y <= v_area[i].bottom ; ++y)
+		{
+			for(x = v_area[i].left; x <= v_area[i].right; ++x)
+			{
+				CvScalar scalar = cvGet2D(out, y - v_area[i].top, x - v_area[i].left);
+				if(arr_mark[y * width + x] == i + 1) scalar.val[0] = 255;
+				else scalar.val[0] = 0;
+				cvSet2D(out, y - v_area[i].top, x - v_area[i].left, scalar);
+			}
+		}
+
+		char filePath[100];
+		sprintf(filePath, "D://log/%d.bmp", i + 1); 
+		cvSaveImage(filePath,out);
+	}
+
+
+	//CString filePath;
+	//char szFilter[] = {"Text Files (*.txt)|*.txt||"};
+	//CFileDialog dlg(FALSE,"txt","image_parameter",OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,szFilter,NULL);
+
+	//if(dlg.DoModal() == IDOK)
+	//{
+	//	filePath = dlg.GetFileName();
+	
+	//	//AfxMessageBox(filePath);
+
+	//	ofstream ipfile(filePath);
+
+	//	for(i = 0; i < v_area.size(); ++i)
+	//	{
+	//		Area area = v_area[i];
+	//		ipfile << (area.right - area.left) * (area.bottom - area.top) << " ";
+	//		ipfile << area.right << " " << area.left << " " << area.bottom << " " << area.top << endl;
+
+	//	}
+
+	//	ipfile.close();
+	//}
+
+}
+
+
+void CImageProcessDoc::OnMenuitemLprAutotest() 
+{
+	// TODO: Add your command handler code here
+
+	IplImage *pImg = m_image.GetImage();
+	
+	int y, x;
+	for(y = 0; y < pImg->height; ++y)
+	{
+		for(x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar= cvGet2D(pImg, y, x);
+			int r = scalar.val[0];
+			int g = scalar.val[1];
+			int b = scalar.val[2];
+
+			if(b > 125)
+			{
+				scalar.val[0] = 255;
+				scalar.val[1] = 255;
+				scalar.val[2] = 255;
+			}
+			else
+			{
+				scalar.val[0] = 0;
+				scalar.val[1] = 0;
+				scalar.val[2] = 0;
+			}
+			cvSet2D(pImg, y, x, scalar);
+		}
+	}
+
+	m_image.CopyOf(pImg, pImg->nChannels);
+
+	UpdateAllViews(NULL);
+	
 }

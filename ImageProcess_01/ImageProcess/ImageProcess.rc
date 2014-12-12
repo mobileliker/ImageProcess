@@ -194,6 +194,11 @@ BEGIN
             MENUITEM "OpenEx(Default)",             ID_MENUITEM_OPENEXDEFAULT
 
         END
+        POPUP "Filter"
+        BEGIN
+            MENUITEM "Laplace",                     ID_MENUITEM_FILTER_LAPLACE
+
+        END
         MENUITEM SEPARATOR
         MENUITEM "Binarization(mode)",          ID_MENUITEM_BINARIZATIONMODE
         MENUITEM "Binarization(Max Entropy)",   ID_MENUITEM_BINARIZATIONMAXENTROPY
@@ -306,6 +311,8 @@ BEGIN
 
             END
         END
+        MENUITEM "Recognition2",                65535
+        MENUITEM "AutoTest",                    ID_MENUITEM_LPR_AUTOTEST
     END
     POPUP "Vein"
     BEGIN
@@ -441,6 +448,16 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About ImageProcess...",      ID_APP_ABOUT
+    END
+    POPUP "Captcha"
+    BEGIN
+        POPUP "Postal"
+        BEGIN
+            MENUITEM "Gray",                        ID_MENUITEM_CP_GRAY
+            MENUITEM "Binary",                      ID_MENUITEM_CP_BINARY
+            MENUITEM "Segmentation",                ID_MENUITEM_CP_SEGMENTATION
+
+        END
     END
 END
 

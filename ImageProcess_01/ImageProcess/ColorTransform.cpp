@@ -95,7 +95,9 @@ bool CColorTransform::RGB2Gray(const BYTE *r, const BYTE *g, const BYTE *b, BYTE
 		for(x = 0; x < width; ++x)
 		{
 			int idx = y * width + x;
-			gray[idx] = (r[idx] + g[idx] + b[idx]) / 3;
+			//gray[idx] = (r[idx] + g[idx] + b[idx]) / 3;
+			gray[idx] = (int)(0.299 * r[idx] + 0.587 * g[idx] + 0.114 * b[idx]);
+			//gray[idx] = b[idx];
 		}
 	}
 	return true;
