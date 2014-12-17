@@ -126,6 +126,8 @@
 #define ID_MENUITEM_CP_BINARY           32893
 #define ID_MENUITEM_CP_SEGMENTATION     32894
 #define ID_MENUITEM_LPR_AUTOTEST        32895
+#define ID_MENUITEM_VEIN_INIT           32896
+#define ID_MENUITEM_VPC_DEFAULT         32897
 
 // Next default values for new objects
 // 
@@ -133,7 +135,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32896
+#define _APS_NEXT_COMMAND_VALUE         32898
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

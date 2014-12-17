@@ -316,6 +316,7 @@ BEGIN
     END
     POPUP "Vein"
     BEGIN
+        MENUITEM "Init",                        ID_MENUITEM_VEIN_INIT
         POPUP "Pretreatment"
         BEGIN
             POPUP "Channelizing"
@@ -324,6 +325,8 @@ BEGIN
 
                 MENUITEM "RGB",                         ID_MENUITEM_VPD_RGB
                 MENUITEM "HSV",                         ID_MENUITEM_VPC_HSV
+                MENUITEM "Default",                     ID_MENUITEM_VPC_DEFAULT
+
             END
             POPUP "Denoising"
             BEGIN
@@ -445,10 +448,6 @@ BEGIN
 
         END
     END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About ImageProcess...",      ID_APP_ABOUT
-    END
     POPUP "Captcha"
     BEGIN
         POPUP "Postal"
@@ -458,6 +457,10 @@ BEGIN
             MENUITEM "Segmentation",                ID_MENUITEM_CP_SEGMENTATION
 
         END
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About ImageProcess...",      ID_APP_ABOUT
     END
 END
 

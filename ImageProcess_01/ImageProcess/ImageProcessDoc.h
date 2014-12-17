@@ -20,6 +20,8 @@
 #include "LicensePlateRecognitionMain.h"
 #include "ImageFilter.h"
 
+#include "VeinProcess.h"
+
 using std::vector;
 
 class CImageProcessDoc : public CDocument
@@ -44,6 +46,7 @@ public:
 
 private:
 	CLicensePlateRecognitionMain m_lprm;
+	CVeinProcess m_vp;
 
 // Operations
 public:
@@ -171,6 +174,8 @@ protected:
 	afx_msg void OnMenuitemCpBinary();
 	afx_msg void OnMenuitemCpSegmentation();
 	afx_msg void OnMenuitemLprAutotest();
+	afx_msg void OnMenuitemVeinInit();
+	afx_msg void OnMenuitemVpcDefault();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

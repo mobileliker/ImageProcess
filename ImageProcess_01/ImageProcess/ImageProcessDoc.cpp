@@ -135,6 +135,8 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_CP_BINARY, OnMenuitemCpBinary)
 	ON_COMMAND(ID_MENUITEM_CP_SEGMENTATION, OnMenuitemCpSegmentation)
 	ON_COMMAND(ID_MENUITEM_LPR_AUTOTEST, OnMenuitemLprAutotest)
+	ON_COMMAND(ID_MENUITEM_VEIN_INIT, OnMenuitemVeinInit)
+	ON_COMMAND(ID_MENUITEM_VPC_DEFAULT, OnMenuitemVpcDefault)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -7004,20 +7006,10 @@ void CImageProcessDoc::OnMenuitemAutotest()
 void CImageProcessDoc::OnMenuitemVpcGraying() 
 {
 	// TODO: Add your command handler code here
-	timeSpan = -1.0;
+	m_vp.channelizing();
 
-	OnMenuitemGetgrayimage();
-	if(timeSpan != -1.0)
-	{
-		ofstream res_file("D://log/res_time.txt");
-		res_file << timeSpan << " ms" << endl;
-		res_file << timeSpan / 1000 << " s" << endl;
-		res_file.close();
+	IplImage *mg1 = m_vp.m_mg1;
 
-		char str[200];
-		sprintf(str,"Finish Get Gray Image.Total Use time:%lf ms",timeSpan);
-		AfxMessageBox(str);
-	}
 }
 
 
@@ -7612,37 +7604,22 @@ void CImageProcessDoc::OnMenuitemCpSegmentation()
 void CImageProcessDoc::OnMenuitemLprAutotest() 
 {
 	// TODO: Add your command handler code here
+	OnMenuitemVeinInit();
+	
+}
 
+void CImageProcessDoc::OnMenuitemVeinInit() 
+{
+	// TODO: Add your command handler code here
 	IplImage *pImg = m_image.GetImage();
 	
-	int y, x;
-	for(y = 0; y < pImg->height; ++y)
-	{
-		for(x = 0; x < pImg->width; ++x)
-		{
-			CvScalar scalar= cvGet2D(pImg, y, x);
-			int r = scalar.val[0];
-			int g = scalar.val[1];
-			int b = scalar.val[2];
+	m_vp.init(pImg);
+}
 
-			if(b > 125)
-			{
-				scalar.val[0] = 255;
-				scalar.val[1] = 255;
-				scalar.val[2] = 255;
-			}
-			else
-			{
-				scalar.val[0] = 0;
-				scalar.val[1] = 0;
-				scalar.val[2] = 0;
-			}
-			cvSet2D(pImg, y, x, scalar);
-		}
-	}
-
-	m_image.CopyOf(pImg, pImg->nChannels);
-
+void CImageProcessDoc::OnMenuitemVpcDefault() 
+{
+	// TODO: Add your command handler code here
+	m_vp.channelizing();
+	m_image.CopyOf(m_vp.m_mg1,m_vp.m_mg1->nChannels);
 	UpdateAllViews(NULL);
-	
 }
