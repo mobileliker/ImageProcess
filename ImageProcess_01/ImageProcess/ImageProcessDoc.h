@@ -176,6 +176,10 @@ protected:
 	afx_msg void OnMenuitemLprAutotest();
 	afx_msg void OnMenuitemVeinInit();
 	afx_msg void OnMenuitemVpcDefault();
+	afx_msg void OnMenuitemVpdDefault();
+	afx_msg void OnMenuitemVsbOtsu();
+	afx_msg void OnMenuitemVsMark();
+	afx_msg void OnMenuitemVsb2Otsu();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

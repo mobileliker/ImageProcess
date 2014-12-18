@@ -137,6 +137,10 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_LPR_AUTOTEST, OnMenuitemLprAutotest)
 	ON_COMMAND(ID_MENUITEM_VEIN_INIT, OnMenuitemVeinInit)
 	ON_COMMAND(ID_MENUITEM_VPC_DEFAULT, OnMenuitemVpcDefault)
+	ON_COMMAND(ID_MENUITEM_VPD_DEFAULT, OnMenuitemVpdDefault)
+	ON_COMMAND(ID_MENUITEM_VSB_OTSU, OnMenuitemVsbOtsu)
+	ON_COMMAND(ID_MENUITEM_VS_MARK, OnMenuitemVsMark)
+	ON_COMMAND(ID_MENUITEM_VSB2_OTSU, OnMenuitemVsb2Otsu)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -7094,8 +7098,11 @@ void CImageProcessDoc::OnMenuitemVpcHsv()
 void CImageProcessDoc::OnMENUITEMVeinAutoTest() 
 {
 	// TODO: Add your command handler code here
-	OnMenuitemVpcGraying();
-	OnMenuitemSmoothfiltering();
+	OnMenuitemVeinInit();
+	OnMenuitemVpcDefault();
+	OnMenuitemVpdDefault();
+	OnMenuitemVsbOtsu();
+	OnMenuitemVsMark();
 }
 
 const int GrayScale = 255;
@@ -7621,5 +7628,37 @@ void CImageProcessDoc::OnMenuitemVpcDefault()
 	// TODO: Add your command handler code here
 	m_vp.channelizing();
 	m_image.CopyOf(m_vp.m_mg1,m_vp.m_mg1->nChannels);
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemVpdDefault() 
+{
+	// TODO: Add your command handler code here
+	m_vp.Denoising();
+	m_image.CopyOf(m_vp.m_mg2, m_vp.m_mg2->nChannels);
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemVsbOtsu() 
+{
+	// TODO: Add your command handler code here
+	m_vp.OTSU();
+	m_image.CopyOf(m_vp.m_mg3, m_vp.m_mg3->nChannels);
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemVsMark() 
+{
+	// TODO: Add your command handler code here
+	m_vp.Location();
+	m_image.CopyOf(m_vp.m_dst1, m_vp.m_dst1->nChannels);
+	UpdateAllViews(NULL);
+}
+
+void CImageProcessDoc::OnMenuitemVsb2Otsu() 
+{
+	// TODO: Add your command handler code here
+	m_vp.OTSU2();
+	m_image.CopyOf(m_vp.m_dst2, m_vp.m_dst2->nChannels);
 	UpdateAllViews(NULL);
 }

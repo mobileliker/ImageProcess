@@ -13,13 +13,24 @@
 #include "cv.h"
 #include "cxcore.h"
 
+#include "Binaryzation.h"
+
 class CVeinProcess  
 {
 public:
+	IplImage *m_dst2;
+	IplImage *m_mg4;
+	IplImage *m_dst1;
+	void OTSU2();
+	void Location();
+	void OTSU();
+	void Denoising();
 	void channelizing();
 	void init(IplImage *src);
-	IplImage * m_src;
-	IplImage * m_mg1;
+	IplImage *m_src;
+	IplImage *m_mg1;
+	IplImage *m_mg2;
+	IplImage *m_mg3;
 	CVeinProcess();
 	virtual ~CVeinProcess();
 

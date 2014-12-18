@@ -12,6 +12,7 @@
 class CBinaryzation  
 {
 public:
+	static int OTSU(const BYTE *src, const int height, const int width, const BYTE *mark);
 	static int OTSU(const BYTE *src, const int height, const int width);
 	CBinaryzation();
 	virtual ~CBinaryzation();

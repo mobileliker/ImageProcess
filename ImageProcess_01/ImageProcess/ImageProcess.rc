@@ -332,9 +332,23 @@ BEGIN
             BEGIN
                 MENUITEM "MeanFiltering",               ID_MENUITEM_VPD_MEANFILTERING
 
+                MENUITEM "Default",                     ID_MENUITEM_VPD_DEFAULT
+
             END
         END
-        MENUITEM "Segmentation",                65535
+        POPUP "Segmentation"
+        BEGIN
+            POPUP "Binary"
+            BEGIN
+                MENUITEM "OTSU",                        ID_MENUITEM_VSB_OTSU
+            END
+            MENUITEM "Location",                    ID_MENUITEM_VS_MARK
+            POPUP "Binary2"
+            BEGIN
+                MENUITEM "OTSU",                        ID_MENUITEM_VSB2_OTSU
+
+            END
+        END
         MENUITEM "VeinAutoTest",                ID_MENUITEM_VeinAutoTest
     END
     POPUP "Soybean"
