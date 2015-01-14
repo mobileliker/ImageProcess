@@ -7103,6 +7103,7 @@ void CImageProcessDoc::OnMENUITEMVeinAutoTest()
 	OnMenuitemVpdDefault();
 	OnMenuitemVsbOtsu();
 	OnMenuitemVsMark();
+	OnMenuitemVsb2Otsu();
 }
 
 const int GrayScale = 255;
