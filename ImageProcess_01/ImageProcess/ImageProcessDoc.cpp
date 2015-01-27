@@ -141,6 +141,7 @@ BEGIN_MESSAGE_MAP(CImageProcessDoc, CDocument)
 	ON_COMMAND(ID_MENUITEM_VSB_OTSU, OnMenuitemVsbOtsu)
 	ON_COMMAND(ID_MENUITEM_VS_MARK, OnMenuitemVsMark)
 	ON_COMMAND(ID_MENUITEM_VSB2_OTSU, OnMenuitemVsb2Otsu)
+	ON_COMMAND(ID_MENUITEM_IMAGETEST, OnMenuitemImagetest)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -7612,8 +7613,40 @@ void CImageProcessDoc::OnMenuitemCpSegmentation()
 void CImageProcessDoc::OnMenuitemLprAutotest() 
 {
 	// TODO: Add your command handler code here
-	OnMenuitemVeinInit();
+		int i;
+
+	IplImage *pImg = m_image.GetImage();
+
+
+	IplImage *dst = cvCreateImage(cvGetSize(pImg), pImg->depth, pImg->nChannels);
 	
+
+	for(int y = 0; y < pImg->height; ++y)
+	{
+		for(int x = 0; x < pImg->width; ++x)
+		{
+			CvScalar scalar = cvGet2D(pImg, y, x);
+			CvScalar s = cvGet2D(dst, y, x);
+			/*if(abs(scalar.val[0] - scalar.val[1]) > 8 )
+			{
+				scalar.val[0] = 0;
+				scalar.val[1] = 0;
+				scalar.val[2] = 0;
+			}*/
+			int tmp = (abs(scalar.val[0] - scalar.val[1]) + abs(scalar.val[0] - scalar.val[2]));
+			if(tmp > 255) tmp = 255;
+			
+
+			scalar.val[0] = tmp;
+			scalar.val[1] = tmp;
+			scalar.val[2] = tmp;
+			cvSet2D(dst, y, x, scalar);
+		}
+	}
+
+	m_image.CopyOf(dst,dst->nChannels);
+	UpdateAllViews(NULL);
+
 }
 
 void CImageProcessDoc::OnMenuitemVeinInit() 
@@ -7662,4 +7695,125 @@ void CImageProcessDoc::OnMenuitemVsb2Otsu()
 	m_vp.OTSU2();
 	m_image.CopyOf(m_vp.m_dst2, m_vp.m_dst2->nChannels);
 	UpdateAllViews(NULL);
+}
+
+
+struct CountF
+{
+	int i;
+	int j;
+	int count;
+};
+
+
+int cmp2(const void *a,const void *b)
+{
+    CountF cf1 = *((CountF *)a);
+    CountF cf2 = *((CountF *)b);
+	return cf2.count - cf1.count;
+}
+
+void CImageProcessDoc::OnMenuitemImagetest() 
+{
+	// TODO: Add your command handler code here
+
+	int i,j;
+	int x,y;
+
+	IplImage *pImg = m_image.GetImage();
+
+	//IplImage *tempImage = cvCreateImage(cvGetSize(pImg),pImg->depth,pImg->nChannels);
+	IplImage* tempImage = cvCloneImage(pImg);
+	//cvNamedWindow("Copy Image");
+	//cvShowImage("Copy Image",tempImage);
+	
+	OnMenuitemGetrgbchannelimage();
+	OnMenuitemGetthresholdimageotsu();
+
+	int block_w = 16;
+	int block_h = 20;
+
+	//IplImage *imgs[20][16];
+	CountF cfs[16 * 20];
+	
+	
+	char filePath[] = "D://log/res.csv";
+	ofstream ipfile(filePath);
+	for(i = 0; i < block_h; ++i)
+	{
+		for(j = 0; j < block_w; ++j)
+		{
+			cfs[i * block_w + j].i = i;
+			cfs[i * block_w + j].j = j;
+			cfs[i * block_w + j].count = 0;
+			IplImage *tmp = cvCreateImage(cvSize(pImg->width / block_w,pImg->height / block_h), pImg->depth, pImg->nChannels); 
+
+			for(y = 0; y < tmp->height; ++y)
+			{
+				for(x = 0; x < tmp->width; ++x)
+				{
+					CvScalar scalar = cvGet2D(pImg, i * tmp->height + y, j * tmp->width + x);
+					
+					if(scalar.val[0] != 0) ++cfs[i * block_w + j].count;
+					cvSet2D(tmp, y, x, scalar);
+				}
+			}
+
+
+			//ipfile << "Block #" << i * block_w + j << ": " <<  cfs[i * block_w + j].count << endl;
+			ipfile << i * block_w + j << "," << cfs[i * block_w + j].count << endl;
+
+
+			char str[200];
+			sprintf(str, "D://log/%d.bmp", i * block_w + j);
+			cvSaveImage(str, tmp);
+
+			cvReleaseImage(&tmp);
+
+
+		}
+	}
+
+	
+	ipfile.close();
+
+	qsort(cfs, 16 * 20, sizeof(CountF), cmp2);
+
+
+	/*char filePath2[] = "D://log/res2.txt";
+	ofstream ipfile2(filePath2);
+
+	for(i = 0; i < 16 * 20; ++i)
+	{
+		ipfile2 << cfs[i].i << "," << cfs[i].j << ":" << cfs[i].count << endl;
+	}
+
+	ipfile2.close();*/
+
+	for(int k = 60; k < 16 * 20; ++k)
+	{
+		i = cfs[k].i;
+		j = cfs[k].j;
+		for(y = 0; y < 20; ++y)
+		{
+			for(x = 0; x < 16; ++x)
+			{
+				CvScalar scalar = cvGet2D(tempImage, i * 20 + y, j * 16 + x);
+				scalar.val[0] = 128;
+				scalar.val[1] = 128;
+				scalar.val[2] = 128;
+				cvSet2D(tempImage, i * 20 + y, j * 16 + x, scalar);
+			}
+		}
+	}
+
+	char str2[200] = "D://log/resImage.bmp";
+	cvSaveImage(str2, tempImage);
+
+	m_image.CopyOf(tempImage,tempImage->nChannels);
+	UpdateAllViews(NULL);
+
+	cvReleaseImage(&tempImage);
+	
+	
 }

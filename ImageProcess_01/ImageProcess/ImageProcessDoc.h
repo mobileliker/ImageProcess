@@ -180,6 +180,7 @@ protected:
 	afx_msg void OnMenuitemVsbOtsu();
 	afx_msg void OnMenuitemVsMark();
 	afx_msg void OnMenuitemVsb2Otsu();
+	afx_msg void OnMenuitemImagetest();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
