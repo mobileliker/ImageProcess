@@ -2,7 +2,7 @@
 
 [General Info]
 Version=1
-LastClass=CImageProcessDoc
+LastClass=CSelectHSVChannelDialog
 LastTemplate=CDialog
 NewFileInclude1=#include "stdafx.h"
 NewFileInclude2=#include "ImageProcess.h"
@@ -15,9 +15,9 @@ Class3=CImageProcessView
 Class4=CMainFrame
 
 ResourceCount=18
-Resource1=IDD_DIALOG_SELECTHSVCHANNEL
+Resource1=IDD_DIALOG_SELECTCALSTYLE
 Resource2=IDD_DIALOG_SELECTROTATE (English (U.S.))
-Resource3=IDD_DIALOG_SELECTSIZE
+Resource3=IDR_MAINFRAME
 Class5=CChildFrame
 Class6=CAboutDlg
 Resource4=IDD_DIALOG_SELECTSIZE (English (U.S.))
@@ -35,11 +35,11 @@ Class11=CSlectCalculateStyleDialog
 Resource11=IDD_ABOUTBOX (English (U.S.))
 Class12=CSelectRotateDialog
 Resource12=IDR_IMAGEPTYPE
-Resource13=IDD_DIALOG_SELECTRGBCHANNEL
-Resource14=IDD_DIALOG_SELECTCALSTYLE
-Resource15=IDR_MAINFRAME
-Resource16=IDD_ABOUTBOX
-Resource17=IDD_DIALOG_SELECTTHRESHOLD
+Resource13=IDD_DIALOG_SELECTSIZE
+Resource14=IDD_ABOUTBOX
+Resource15=IDD_DIALOG_SELECTTHRESHOLD
+Resource16=IDD_DIALOG_SELECTRGBCHANNEL
+Resource17=IDD_DIALOG_SELECTHSVCHANNEL
 Resource18=IDD_DIALOG_SELECTROTATE
 
 [CLS:CImageProcessApp]
@@ -55,14 +55,14 @@ ImplementationFile=ImageProcessDoc.cpp
 Filter=N
 BaseClass=CDocument
 VirtualFilter=DC
-LastObject=ID_MENUITEM_GETHisTOGRAM
+LastObject=CImageProcessDoc
 
 [CLS:CImageProcessView]
 Type=0
 HeaderFile=ImageProcessView.h
 ImplementationFile=ImageProcessView.cpp
 Filter=C
-LastObject=ID_MENUITEM_GETTHRESHOLDIMAGEOTSU
+LastObject=ID_MENUITEM_GETALLIMAGEPOINT
 BaseClass=CView
 VirtualFilter=VWC
 
